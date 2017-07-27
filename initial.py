@@ -3,6 +3,7 @@ import math
 import numpy as np
 import h5py
 
+
 def cut_suffix(fileName):
     return fileName.split('.')[0]
 
