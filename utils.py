@@ -95,7 +95,7 @@ def next_batch(sess, model, data_dir, h5File, idList):
         img2 = load_image("%s/%s.jpg" % (data_dir, idList[idx2]))
         img3 = load_image("%s/%s.jpg" % (data_dir, idList[idx3]))
         img4 = load_image("%s/%s.jpg" % (data_dir, idList[idx4]))
-        x = tf.stack([img1, img2, img3, img4])
+        x = np.stack([img1, img2, img3, img4])
 
         pos1 = fH5["%s/positives" % idList[idx1]]
         pos2 = fH5["%s/positives" % idList[idx2]]
@@ -112,14 +112,14 @@ def next_batch(sess, model, data_dir, h5File, idList):
             img2 = load_image("%s/%s.jpg" % (data_dir, idList[pos2[j]]))
             img3 = load_image("%s/%s.jpg" % (data_dir, idList[pos3[j]]))
             img4 = load_image("%s/%s.jpg" % (data_dir, idList[pos4[j]]))
-            batch = tf.stack([img1, img2, img3, img4])
+            batch = np.stack([img1, img2, img3, img4])
             labels[:,j,:] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
         for k in range(20):
             img1 = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
             img2 = load_image("%s/%s.jpg" % (data_dir, idList[neg2[k]]))
             img3 = load_image("%s/%s.jpg" % (data_dir, idList[neg3[k]]))
             img4 = load_image("%s/%s.jpg" % (data_dir, idList[neg4[k]]))
-            batch = tf.stack([img1, img2, img3, img4])
+            batch = np.stack([img1, img2, img3, img4])
             labels[:,k + 10,:] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
 
         yield x, labels, z
