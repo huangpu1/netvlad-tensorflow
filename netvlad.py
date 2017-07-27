@@ -111,7 +111,7 @@ class Netvlad:
             V2 = tf.multiply(tf.tile(tf.reduce_sum(a_k, axis = 1, keep_dims = True), [1, 512, 1]), centers)     # V_1 is B x D x K
             V = V1 - V2
             
-            norm = tf.nn.l2_normalize(tf.nn.reshape(tf.nn.l2_normalize(V, dim = 1), shape = [-1]), dim = 1)     # norm is B x (D x K)
+            norm = tf.nn.l2_normalize(tf.nn.reshape(tf.nn.l2_normalize(V, dim = 1), shape = [V.get_shape().as_list()[0], -1]), dim = 1)     # norm is B x (D x K)
 
             return norm
 
