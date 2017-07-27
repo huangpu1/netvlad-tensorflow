@@ -96,6 +96,8 @@ def next_batch(sess, model, data_dir, h5File, idList):
         img3 = load_image("%s/%s.jpg" % (data_dir, idList[idx3]))
         img4 = load_image("%s/%s.jpg" % (data_dir, idList[idx4]))
         x = np.stack([img1, img2, img3, img4])
+        print("x shape is :\n")
+        print(x.shape)
 
         pos1 = fH5["%s/positives" % idList[idx1]]
         pos2 = fH5["%s/positives" % idList[idx2]]
