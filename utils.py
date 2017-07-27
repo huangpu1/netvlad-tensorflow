@@ -106,7 +106,7 @@ def next_batch(sess, model, data_dir, h5File, idList):
         neg3 = fH5["%s/negatives" % idList[idx3]]
         neg4 = fH5["%s/negatives" % idList[idx4]]
 
-        labels = np.zeros(4, 30, 32768)
+        labels = np.zeros((4, 30, 32768))
         for j in range(10):
             img1 = load_image("%s/%s.jpg" % (data_dir, idList[pos1[j]]))
             img2 = load_image("%s/%s.jpg" % (data_dir, idList[pos2[j]]))
