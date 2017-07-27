@@ -109,7 +109,7 @@ class Netvlad:
 
             V1 = tf.matmul(conv_reshape, a_k, transpose_a = True)    # V_1 is B x D x K
             V2 = tf.multiply(tf.reduce_sum(a_k, axis = 1, keep_dims = True), centers)     # V_1 is B x D x K
-            V = V1 - V2
+            V = tf.subtract(V1, V2)
             
             print(V.get_shape().as_list())
 
