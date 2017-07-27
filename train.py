@@ -51,7 +51,7 @@ with tf.device('/gpu:1'):
                 utils.index_update(sess, model, data_dir, h5File, idList)
             count = count + 1
             _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
-            if count % 5 == 0:
+            if count % 1 == 0:
                 print("Epoch: %d    progress: %.4f  training_loss = %.6f\n" % (i, z, train_loss))
         if (i + 1) % 5 == 0:
             model.save_npy(sess, "./netvlad_training_epoch_%d_loss_%.6f" % (i, train_loss))

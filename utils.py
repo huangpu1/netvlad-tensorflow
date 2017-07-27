@@ -55,7 +55,7 @@ def index_update(sess, model, data_dir, h5File, idList):
     for i, ID in enumerate(idList):
         img = load_image("%s/%s.jpg" % (data_dir, ID))
         batch = img.reshape((1, 224, 224, 3))
-        descriptor[i,:] = tf.reshape(sess.run(model.vlad_output, feed_dict = {query_image: batch, train_mode : False}), [32768])
+        descriptor[i,:] = tf.reshape(sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False}), [32768])
 
     """for i in range(len(idList)):
         for j in range(len(idList)):
