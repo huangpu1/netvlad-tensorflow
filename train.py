@@ -26,9 +26,9 @@ def triplet_loss(q, labels, m):
 with tf.device('/gpu:1'):
     sess = tf.Session()
 
-    query_image = tf.placeholder(tf.float32,[None, 224, 224, 3])
+    query_image = tf.placeholder(tf.float32,[None, 224, 224, 3], name = 'query_image')
     labels = tf.placeholder(tf.float32, [None, 30, 32768])
-    train_mode = tf.placeholder(tf.bool)
+    train_mode = tf.placeholder(tf.bool, name = 'train_mode')
 
     model = netvlad.Netvlad('./vgg16.npy')
     model.build(query_image, train_mode)
