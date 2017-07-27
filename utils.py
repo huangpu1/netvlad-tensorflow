@@ -113,7 +113,11 @@ def next_batch(sess, model, data_dir, h5File, idList):
             img3 = load_image("%s/%s.jpg" % (data_dir, idList[pos3[j]]))
             img4 = load_image("%s/%s.jpg" % (data_dir, idList[pos4[j]]))
             batch = np.stack([img1, img2, img3, img4])
+            print("batch shape is:\n")
+            print(batch.shape)
             labels[:,j,:] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
+            print("label shape is:\n")
+            print(labels.shape)
         for k in range(20):
             img1 = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
             img2 = load_image("%s/%s.jpg" % (data_dir, idList[neg2[k]]))
