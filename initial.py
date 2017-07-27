@@ -7,6 +7,11 @@ import h5py
 def cut_suffix(fileName):
     return fileName.split('.')[0]
 
+def get_idList(data_dir):
+    fileList = [x for x in os.listdir(data_dir) if os.path.splitext(x)[1] == '.csv']
+    idList = list(map(cut_suffix, fileList))
+
+    return idList
 
 def compute_dist(data_dir, h5_file):
     fH5 = h5py.File(h5_file, "r+")
@@ -39,7 +44,8 @@ def compute_dist(data_dir, h5_file):
                     distMat[j, i] = distMat[i, j]
 
     fH5.close()
-    return fileList, imageList, idList
+
+    return idList
 
 
 def h5_initial():
@@ -48,6 +54,7 @@ def h5_initial():
     if not os.path.exists("index_dir/datafile.hdf5"):
         f = h5py.File("index_dir/datafile.hdf5", 'w')
         f.close()
+
     return
 
 
@@ -100,4 +107,5 @@ def index_initial(h5File, idList):
             neg[k] = neg[k - 10]
 
     fH5.close()
+
     return

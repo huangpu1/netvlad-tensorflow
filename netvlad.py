@@ -98,10 +98,12 @@ class Netvlad:
         with tf.variable_scope(name):
             filt, conv_biases, centers = self.get_vald_pooling_var(k_cluster, alpha, name)
 
-            conv_reshape = tf.reshape(bottom, shape = [-1, 512], name = 'reshape')    # conv_reshape is B x N x D
+            print("batch_size is%s" % bottom.get_shape().as_list()[0])
+
+            conv_reshape = tf.reshape(bottom, shape = [bottom.get_shape().as_list()[0], -1, 512], name = 'reshape')    # conv_reshape is B x N x D
             conv_norm = tf.nn.l2_normalize(conv_reshape, dim = 0)
             descriptor = tf.expand_dims(conv_norm, axis = -1, name = 'expanddim')  # descriptor is B x N x D x 1
-            conv_vlad = tf.nn.convolution(descriptor, filt, [1, 1, 1, 1], padding = 'VALID')  # conv_vlad is B x N x 1 x K
+            conv_vlad = tf.nn.convolution(descriptor, filt, padding = 'VALID')  # conv_vlad is B x N x 1 x K
             bias = tf.nn.bias_add(conv_vlad, conv_biases)
             a_k = tf.nn.softmax(tf.squeeze(bias), dim = -1, name = "vlad_softmax")     # a_k is B x N x K
 

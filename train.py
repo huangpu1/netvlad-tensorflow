@@ -9,9 +9,13 @@ numEpoch = 30
 data_dir = "247query_subset_v2"
 h5File = "index_dir/datafile.hdf5"
 
+"""
 initial.h5_initial()
-fileList, imageList, idList = initial.compute_dist(data_dir, h5File)
+idList = initial.compute_dist(data_dir, h5File)
 initial.index_initial(h5File, idList)
+"""
+
+idList = initial.get_idList(data_dir)
 
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(q, labels), axis = -1)
