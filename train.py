@@ -43,6 +43,7 @@ with tf.device('/gpu:1'):
     
 
     count = 0
+    print("training begins!\n")
     for i in range(numEpoch):
         for x, y, z in utils.next_batch(sess, model, data_dir, h5File, idList):
             if count >= 50:
