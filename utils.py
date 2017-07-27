@@ -83,7 +83,7 @@ def next_batch(sess, model, data_dir, h5File, idList):
     idx2 = idx1 + 1
     idx3 = idx1 + 2
     idx4 = idx1 + 3
-    for i in range(numBatch + 1):
+    for i in range(int(numBatch + 1):
         z = i / numBatch
 
         idx1 = idx1 % length
