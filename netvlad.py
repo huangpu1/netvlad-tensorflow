@@ -98,7 +98,7 @@ class Netvlad:
         with tf.variable_scope(name):
             filt, conv_biases, centers = self.get_vald_pooling_var(k_cluster, alpha, name)
 
-            print("N = %s" % (bottom.get_shape().as_list()[1] * bottom.get_shape().as_list()[2]))
+            print(bottom.get_shape().as_list())
 
             conv_reshape = tf.reshape(bottom, shape = [-1, (bottom.get_shape().as_list()[1] * bottom.get_shape().as_list()[2]), 512], name = 'reshape')    # conv_reshape is B x N x D
             conv_norm = tf.nn.l2_normalize(conv_reshape, dim = 0)
