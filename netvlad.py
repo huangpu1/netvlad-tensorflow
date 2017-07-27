@@ -100,7 +100,7 @@ class Netvlad:
 
             print("batch_size is%s" % bottom.get_shape().as_list()[0])
 
-            conv_reshape = tf.reshape(bottom, shape = [bottom.get_shape().as_list()[0], -1, 512], name = 'reshape')    # conv_reshape is B x N x D
+            conv_reshape = tf.reshape(bottom, shape = [-1, 512], name = 'reshape')    # conv_reshape is B x N x D
             conv_norm = tf.nn.l2_normalize(conv_reshape, dim = 0)
             descriptor = tf.expand_dims(conv_norm, axis = -1, name = 'expanddim')  # descriptor is B x N x D x 1
             conv_vlad = tf.nn.convolution(descriptor, filt, padding = 'VALID')  # conv_vlad is B x N x 1 x K
@@ -111,7 +111,7 @@ class Netvlad:
             V2 = tf.multiply(tf.tile(tf.reduce_sum(a_k, axis = 1, keep_dims = True), [1, 512, 1]), centers)     # V_1 is B x D x K
             V = V1 - V2
             
-            norm = tf.nn.l2_normalize(tf.nn.reshape(tf.nn.l2_normalize(V, dim = 1), shape = [V.get_shape().as_list()[0], -1]), dim = 1)     # norm is B x (D x K)
+            norm = tf.nn.l2_normalize(tf.nn.reshape(tf.nn.l2_normalize(V, dim = 1), shape = [-1]), dim = 1)     # norm is B x (D x K)
 
             return norm
 
