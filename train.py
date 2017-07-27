@@ -20,7 +20,7 @@ idList = initial.get_idList(data_dir)
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(q, labels), axis = -1)
     print(L2_distance)
-    positives, negatives = tf.split(L2_distance, [10, 20], axis = -1)
+    positives, negatives = tf.split(L2_distance, [10, 20], axis = 1)
     loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1) + m - negatives))
     return loss
 
