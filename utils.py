@@ -49,6 +49,7 @@ def load_image2(path, height=None, width=None):
     return skimage.transform.resize(img, (ny, nx))
 
 def index_update(sess, model, data_dir, h5File, idList):
+    print("Updating positives and negatives...\n")
     fH5 = h5py.File(h5File, 'r+')
     descriptor = np.zeros((len(idList), 32768))
     L2_distance = np.zeros((len(idList), len(idList)))
@@ -93,10 +94,10 @@ def next_batch(sess, model, data_dir, h5File, idList):
         idx4 = idx4 % length
 
         x = np.zeros((4, 224, 224, 3))
-        x[0, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx1]))
-        x[1, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx2]))
-        x[2, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx3]))
-        x[3, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx4]))
+        x[0, :] = fH5["%s/imageData" % idList[idx1]]
+        x[1, :] = fH5["%s/imageData" % idList[idx2]]
+        x[2, :] = fH5["%s/imageData" % idList[idx3]]
+        x[3, :] = fH5["%s/imageData" % idList[idx4]]
         print("x shape is :\n")
         print(x.shape)
 
@@ -112,20 +113,22 @@ def next_batch(sess, model, data_dir, h5File, idList):
         labels = np.zeros((4, 32768, 30))
         batch = np.zeros((120, 224, 224, 3))
         for j in range(10):
-            batch[(4 * j), :] = load_image("%s/%s.jpg" % (data_dir, idList[pos1[j]]))
-            batch[(4 * j + 1), :] = load_image("%s/%s.jpg" % (data_dir, idList[pos2[j]]))
-            batch[(4 * j + 2), :] = load_image("%s/%s.jpg" % (data_dir, idList[pos3[j]]))
-            batch[(4 * j + 3), :] = load_image("%s/%s.jpg" % (data_dir, idList[pos4[j]]))
+            batch[(4 * j), :] = fH5["%s/imageData" % idList[pos1[j]]]
+            batch[(4 * j + 1), :] = fH5["%s/imageData" % idList[pos2[j]]]
+            batch[(4 * j + 2), :] = fH5["%s/imageData" % idList[pos3[j]]]
+            batch[(4 * j + 3), :] = fH5["%s/imageData" % idList[pos4[j]]]
             print("j: %s\n" % j)
         for k in range(20):
-            batch[(4 * k + 40), :] = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
-            batch[(4 * k + 41), :] = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
-            batch[(4 * k + 42), :] = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
-            batch[(4 * k + 43), :] = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
+            batch[(4 * k + 40), :] = fH5["%s/imageData" % idList[neg1[k]]]
+            batch[(4 * k + 41), :] = fH5["%s/imageData" % idList[neg2[k]]]
+            batch[(4 * k + 42), :] = fH5["%s/imageData" % idList[neg3[k]]]
+            batch[(4 * k + 43), :] = fH5["%s/imageData" % idList[neg4[k]]]
             print("k: %s\n" % k)
         begin = time.clock()
         output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
         end = time.clock()
+        print("output shape is \n")
+        print(output.shape)
         print("forward time is %.4f\n" % (end - begin))
         for j in range(30):
             labels[:, :, j] = output[(30 * j) : (30 * j + 4), :]

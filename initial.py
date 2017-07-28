@@ -3,6 +3,8 @@ import math
 import numpy as np
 import h5py
 
+import utils
+
 
 def cut_suffix(fileName):
     return fileName.split('.')[0]
@@ -57,6 +59,16 @@ def h5_initial():
 
     return
 
+def load_image(data_dir, h5File, idList):
+    print("Loading image data...\n")
+    fH5 = h5py.File(h5File, 'r+')
+    for i, ID in enumerate(idList):
+        if not "imageData" in fH5[ID]:
+            fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
+        fH5["%s/imageData" % ID][:] = utils.load_image(("%s/%s.jpg" % (data_dir, idList[i])))
+    fH5.close()
+
+    return
 
 def index_initial(h5File, idList):
     fH5 = h5py.File(h5File, 'r+')
