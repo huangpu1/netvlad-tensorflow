@@ -3,12 +3,16 @@ import tensorflow as tf
 import netvlad
 import utils
 import initial
+import os
 
 batch_size = 4
 numEpoch = 30
+checkpoint_dir = "checkpoing"
 data_dir = "247query_subset_v2"
 h5File = "index_dir/datafile.hdf5"
 
+if not os.path.exists(checkpoint_dir):
+    os.mkdir(checkpoint_dir)
 """
 initial.h5_initial()
 idList = initial.compute_dist(data_dir, h5File)
@@ -55,5 +59,5 @@ with tf.device('/gpu:0'):
             if count % 1 == 0:
                 print("Epoch: %d    progress: %.4f  training_loss = %.6f\n" % (i, z, train_loss))
         if (i + 1) % 5 == 0:
-            model.save_npy(sess, "./netvlad_training_epoch_%d_loss_%.6f" % (i, train_loss))
+            model.save_npy(sess, "%s/netvlad_epoch_%d_loss_%.6f" % (checkpoint_dir, i, train_loss))
 
