@@ -20,10 +20,10 @@ idList = initial.get_idList(data_dir)
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
     positives, negatives = tf.split(L2_distance, [10, 20], axis = 1)
-    loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1) + m - negatives))
+    loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
     return loss
 
-with tf.device('/gpu:1'):
+with tf.device('/gpu:0'):
     sess = tf.Session()
 
     query_image = tf.placeholder(tf.float32,[None, 224, 224, 3], name = 'query_image')
