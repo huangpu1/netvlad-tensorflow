@@ -56,7 +56,7 @@ def index_update(sess, model, data_dir, h5File, idList):
 
     batch = np.zeros((120, 224, 224, 3))
     single = np.zeros((1, 224, 224, 3))
-    numBatch = int(math.floor(len(idList / 120)))
+    numBatch = int(math.floor(len(idList) / 120))
     for i in range(numBatch):
         for j in range(120):
             ID = idList[i * 120 + j]
