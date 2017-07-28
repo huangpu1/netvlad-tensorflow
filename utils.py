@@ -54,10 +54,17 @@ def index_update(sess, model, data_dir, h5File, idList):
     descriptor = np.zeros((len(idList), 32768))
     L2_distance = np.zeros((len(idList), len(idList)))
 
-    for i, ID in enumerate(idList):
-        img = load_image("%s/%s.jpg" % (data_dir, ID))
-        batch = img.reshape((1, 224, 224, 3))
-        descriptor[i,:] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False}).reshape((32768,))
+    batch = np.zeros((120, 224, 224, 3))
+    single = np.zeros((1, 224, 224, 3))
+    numBatch = int(math.floor(len(idList / 120)))
+    for i in range(numBatch):
+        for j in range(120):
+            ID = idList[i * 120 + j]
+            batch[j, :] = fH5["%s/imageData" % ID]
+        descriptor[(i * 120) : (i * 120 + 120), :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
+    for i in range(120 * numBatch : len(idList)):
+        single = fH5["%s/imageData" % idList[i]]
+        descriptor[i, :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': single, 'train_mode:0' : False})
 
     """for i in range(len(idList)):
         for j in range(len(idList)):
@@ -68,7 +75,7 @@ def index_update(sess, model, data_dir, h5File, idList):
         L2_dist = {}
         pneg = fH5["%s/potential_negatives" % ID]
         for j in pneg:
-            L2_dist[str(i)] = tf.norm(tf.subtract(descriptor[i, :], descriptor[j, :]))
+            L2_dist[str(j)] = tf.norm(tf.subtract(descriptor[i, :], descriptor[j, :]))
         L2Sorted = sorted(L2_dist.items(), key = lambda e:e[1])
 
         for k in range(10):
