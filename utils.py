@@ -92,7 +92,7 @@ def next_batch(sess, model, data_dir, h5File, idList):
         idx3 = idx3 % length
         idx4 = idx4 % length
 
-        x = np.zeros(4, 224, 224, 3)
+        x = np.zeros((4, 224, 224, 3))
         x[0, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx1]))
         x[1, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx2]))
         x[2, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx3]))
