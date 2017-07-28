@@ -98,8 +98,6 @@ class Netvlad:
         with tf.variable_scope(name):
             filt, conv_biases, centers = self.get_vald_pooling_var(k_cluster, alpha, name)
 
-            print(bottom.get_shape().as_list())
-
             conv_reshape = tf.reshape(bottom, shape = [-1, (bottom.get_shape().as_list()[1] * bottom.get_shape().as_list()[2]), 512], name = 'reshape')    # conv_reshape is B x N x D
             conv_norm = tf.nn.l2_normalize(conv_reshape, dim = 0)
             descriptor = tf.expand_dims(conv_norm, axis = -1, name = 'expanddim')  # descriptor is B x N x D x 1
@@ -110,8 +108,6 @@ class Netvlad:
             V1 = tf.matmul(conv_reshape, a_k, transpose_a = True)    # V_1 is B x D x K
             V2 = tf.multiply(tf.reduce_sum(a_k, axis = 1, keep_dims = True), centers)     # V_1 is B x D x K
             V = tf.subtract(V1, V2)
-            
-            print(V)
 
             norm = tf.nn.l2_normalize(tf.reshape(tf.nn.l2_normalize(V, dim = 1), shape = [-1, 32768]), dim = 1)     # norm is B x (D x K)
 
