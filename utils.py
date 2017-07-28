@@ -99,8 +99,6 @@ def next_batch(sess, model, data_dir, h5File, idList):
         x[1, :] = fH5["%s/imageData" % idList[idx2]]
         x[2, :] = fH5["%s/imageData" % idList[idx3]]
         x[3, :] = fH5["%s/imageData" % idList[idx4]]
-        print("x shape is :\n")
-        print(x.shape)
 
         pos1 = fH5["%s/positives" % idList[idx1]]
         pos2 = fH5["%s/positives" % idList[idx2]]
@@ -118,19 +116,12 @@ def next_batch(sess, model, data_dir, h5File, idList):
             batch[(4 * j + 1), :] = fH5["%s/imageData" % idList[pos2[j]]]
             batch[(4 * j + 2), :] = fH5["%s/imageData" % idList[pos3[j]]]
             batch[(4 * j + 3), :] = fH5["%s/imageData" % idList[pos4[j]]]
-            print("j: %s\n" % j)
         for k in range(20):
             batch[(4 * k + 40), :] = fH5["%s/imageData" % idList[neg1[k]]]
             batch[(4 * k + 41), :] = fH5["%s/imageData" % idList[neg2[k]]]
             batch[(4 * k + 42), :] = fH5["%s/imageData" % idList[neg3[k]]]
             batch[(4 * k + 43), :] = fH5["%s/imageData" % idList[neg4[k]]]
-            print("k: %s\n" % k)
-        begin = time.clock()
         output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
-        end = time.clock()
-        print("output shape is \n")
-        print(output.shape)
-        print("forward time is %.4f\n" % (end - begin))
         for j in range(30):
             labels[:, :, j] = output[(4 * j) : (4 * j + 4), :]
 
