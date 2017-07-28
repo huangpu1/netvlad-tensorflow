@@ -63,19 +63,16 @@ def index_update(sess, model, data_dir, h5File, idList):
             batch[j, :] = fH5["%s/imageData" % ID]
         descriptor[(i * 120) : (i * 120 + 120), :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
     for i in range(120 * numBatch, len(idList)):
-        single[1, :] = fH5["%s/imageData" % idList[i]]
+        single[0, :] = fH5["%s/imageData" % idList[i]]
         descriptor[i, :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': single, 'train_mode:0' : False})
 
-    """for i in range(len(idList)):
-        for j in range(len(idList)):
-            L2_distance[i, j] = tf.norm(tf.subtract(descriptor[i, :], descriptor[j,:]))"""
         
     for i, ID in enumerate(idList):
         neg = fH5["%s/negatives" % ID]
         L2_dist = {}
         pneg = fH5["%s/potential_negatives" % ID]
         for j in pneg:
-            L2_dist[str(j)] = tf.norm(tf.subtract(descriptor[i, :], descriptor[j, :]))
+            L2_dist[str(j)] = np.linalg.norm(descriptor[i, :] - descriptor[j, :])
         L2Sorted = sorted(L2_dist.items(), key = lambda e:e[1])
 
         for k in range(10):
