@@ -9,6 +9,7 @@ import math
 import h5py
 import os
 import random
+import time
 
 
 # returns image of shape [224, 224, 3]
@@ -91,11 +92,11 @@ def next_batch(sess, model, data_dir, h5File, idList):
         idx3 = idx3 % length
         idx4 = idx4 % length
 
-        img1 = load_image("%s/%s.jpg" % (data_dir, idList[idx1]))
-        img2 = load_image("%s/%s.jpg" % (data_dir, idList[idx2]))
-        img3 = load_image("%s/%s.jpg" % (data_dir, idList[idx3]))
-        img4 = load_image("%s/%s.jpg" % (data_dir, idList[idx4]))
-        x = np.stack([img1, img2, img3, img4])
+        x = np.zeros(4, 224, 224, 3)
+        x[0, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx1]))
+        x[1, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx2]))
+        x[2, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx3]))
+        x[3, :] = load_image("%s/%s.jpg" % (data_dir, idList[idx4]))
         print("x shape is :\n")
         print(x.shape)
 
@@ -109,22 +110,26 @@ def next_batch(sess, model, data_dir, h5File, idList):
         neg4 = fH5["%s/negatives" % idList[idx4]]
 
         labels = np.zeros((4, 32768, 30))
+        batch = np.zeros((120, 224, 224, 3))
         for j in range(10):
-            img1 = load_image("%s/%s.jpg" % (data_dir, idList[pos1[j]]))
-            img2 = load_image("%s/%s.jpg" % (data_dir, idList[pos2[j]]))
-            img3 = load_image("%s/%s.jpg" % (data_dir, idList[pos3[j]]))
-            img4 = load_image("%s/%s.jpg" % (data_dir, idList[pos4[j]]))
-            batch = np.stack([img1, img2, img3, img4])
+            batch[(4 * j), :] = load_image("%s/%s.jpg" % (data_dir, idList[pos1[j]]))
+            batch[(4 * j + 1), :] = load_image("%s/%s.jpg" % (data_dir, idList[pos2[j]]))
+            batch[(4 * j + 2), :] = load_image("%s/%s.jpg" % (data_dir, idList[pos3[j]]))
+            batch[(4 * j + 3), :] = load_image("%s/%s.jpg" % (data_dir, idList[pos4[j]]))
             print("j: %s\n" % j)
-            labels[:, :, j] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
         for k in range(20):
-            img1 = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
-            img2 = load_image("%s/%s.jpg" % (data_dir, idList[neg2[k]]))
-            img3 = load_image("%s/%s.jpg" % (data_dir, idList[neg3[k]]))
-            img4 = load_image("%s/%s.jpg" % (data_dir, idList[neg4[k]]))
-            batch = np.stack([img1, img2, img3, img4])
-            labels[:, :, k + 10] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
+            batch[(4 * k + 40), :] = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
+            batch[(4 * k + 41), :] = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
+            batch[(4 * k + 42), :] = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
+            batch[(4 * k + 43), :] = load_image("%s/%s.jpg" % (data_dir, idList[neg1[k]]))
             print("k: %s\n" % k)
+        begin = time.clock()
+        output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
+        end = time.clock()
+        print("forward time is %.4f\n" % (end - begin))
+        for j in range(30):
+            labels[:, :, j] = output[(30 * j) : (30 * j + 4), :]
+
         yield x, labels, z
 
         idx1 += 4
