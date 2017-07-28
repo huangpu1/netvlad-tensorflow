@@ -132,7 +132,7 @@ def next_batch(sess, model, data_dir, h5File, idList):
         print(output.shape)
         print("forward time is %.4f\n" % (end - begin))
         for j in range(30):
-            labels[:, :, j] = output[(30 * j) : (30 * j + 4), :]
+            labels[:, :, j] = output[(4 * j) : (4 * j + 4), :]
 
         yield x, labels, z
 

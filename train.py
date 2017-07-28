@@ -16,7 +16,7 @@ initial.index_initial(h5File, idList)
 """
 
 idList = initial.get_idList(data_dir)
-initial.load_image(data_dir, h5File, idList)
+# initial.load_image(data_dir, h5File, idList)
 
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
