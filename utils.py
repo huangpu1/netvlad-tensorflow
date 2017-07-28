@@ -63,7 +63,7 @@ def index_update(sess, model, data_dir, h5File, idList):
             batch[j, :] = fH5["%s/imageData" % ID]
         descriptor[(i * 120) : (i * 120 + 120), :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
     for i in range(120 * numBatch, len(idList)):
-        single = fH5["%s/imageData" % idList[i]]
+        single[1, :] = fH5["%s/imageData" % idList[i]]
         descriptor[i, :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': single, 'train_mode:0' : False})
 
     """for i in range(len(idList)):
