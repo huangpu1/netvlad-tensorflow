@@ -67,6 +67,7 @@ def load_image(data_dir, h5File, idList):
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
         fH5["%s/imageData" % ID][:] = utils.load_image(("%s/%s.jpg" % (data_dir, idList[i])))
     fH5.close()
+    print("Done!\n")
 
     return
 

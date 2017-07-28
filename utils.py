@@ -75,6 +75,7 @@ def index_update(sess, model, data_dir, h5File, idList):
             neg[10 + k] = neg[k]
             neg[k] = int(L2Sorted[k][0])
     fH5.close()
+    print("Done!\n")
     return
 
 def next_batch(sess, model, data_dir, h5File, idList):
