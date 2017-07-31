@@ -55,7 +55,7 @@ with tf.device('/gpu:0'):
         for x, y, z in utils.next_batch(sess, model, batch_size, data_dir, h5File, idList):
             if count >= 50:
                 count = 0
-                utils.index_update(sess, model, data_dir, h5File, idList)
+                utils.index_update(sess, model, batch_size * 30, data_dir, h5File, idList)
             count = count + 1
             _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
             if count % 1 == 0:

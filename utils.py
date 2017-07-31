@@ -48,21 +48,21 @@ def load_image2(path, height=None, width=None):
         nx = img.shape[1]
     return skimage.transform.resize(img, (ny, nx))
 
-def index_update(sess, model, data_dir, h5File, idList):
+def index_update(sess, model, batch_size, data_dir, h5File, idList):
     print("Updating positives and negatives...\n")
     fH5 = h5py.File(h5File, 'r+')
     descriptor = np.zeros((len(idList), 32768))
     L2_distance = np.zeros((len(idList), len(idList)))
 
-    batch = np.zeros((120, 224, 224, 3))
+    batch = np.zeros((batch_size, 224, 224, 3))
     single = np.zeros((1, 224, 224, 3))
-    numBatch = int(math.floor(len(idList) / 120))
+    numBatch = int(math.floor(len(idList) / batch_size))
     for i in range(numBatch):
-        for j in range(120):
-            ID = idList[i * 120 + j]
+        for j in range(batch_size):
+            ID = idList[i * batch_size + j]
             batch[j, :] = fH5["%s/imageData" % ID]
-        descriptor[(i * 120) : (i * 120 + 120), :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
-    for i in range(120 * numBatch, len(idList)):
+        descriptor[(i * batch_size) : (i * batch_size + batch_size), :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
+    for i in range(batch_size * numBatch, len(idList)):
         single[0, :] = fH5["%s/imageData" % idList[i]]
         descriptor[i, :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': single, 'train_mode:0' : False})
 
