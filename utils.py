@@ -82,58 +82,33 @@ def index_update(sess, model, data_dir, h5File, idList):
     print("Done!\n")
     return
 
-def next_batch(sess, model, data_dir, h5File, idList):
+def next_batch(sess, model, batch_size, data_dir, h5File, idList):
     length = len(idList)
-    numBatch = math.floor(length / 4)
+    numBatch = math.floor(length / batch_size)
     fH5 = h5py.File(h5File, 'r+')
-    idx1 = random.randint(0, length - 1)
-    idx2 = idx1 + 1
-    idx3 = idx1 + 2
-    idx4 = idx1 + 3
+    idx = random.randint(0, length - 1)
     for i in range(int(numBatch + 1)):
         z = i / numBatch
+        x = np.zeros((batch_size, 224, 224, 3))
+        labels = np.zeros((batch_size, 32768, 30))
+        batch = np.zeros((batch_size * 30, 224, 224, 3))
+        for t in range(batch_size):
+            idx = idx % length
+            
+            x[t, :] = fH5["%s/imageData" % idList[idx]]
+            pos = fH5["%s/positives" % idList[idx]]
+            neg = fH5["%s/negatives" % idList[idx]]
 
-        idx1 = idx1 % length
-        idx2 = idx2 % length
-        idx3 = idx3 % length
-        idx4 = idx4 % length
+            for j in range(10):
+                batch[(batch_size * j + t), :] = fH5["%s/imageData" % idList[pos[j]]]
+            for k in range(20):
+                batch[(batch_size * k + 10 * batch_size + t), :] = fH5["%s/imageData" % idList[neg[k]]]
+            idx += 1
 
-        x = np.zeros((4, 224, 224, 3))
-        x[0, :] = fH5["%s/imageData" % idList[idx1]]
-        x[1, :] = fH5["%s/imageData" % idList[idx2]]
-        x[2, :] = fH5["%s/imageData" % idList[idx3]]
-        x[3, :] = fH5["%s/imageData" % idList[idx4]]
-
-        pos1 = fH5["%s/positives" % idList[idx1]]
-        pos2 = fH5["%s/positives" % idList[idx2]]
-        pos3 = fH5["%s/positives" % idList[idx3]]
-        pos4 = fH5["%s/positives" % idList[idx4]]
-        neg1 = fH5["%s/negatives" % idList[idx1]]
-        neg2 = fH5["%s/negatives" % idList[idx2]]
-        neg3 = fH5["%s/negatives" % idList[idx3]]
-        neg4 = fH5["%s/negatives" % idList[idx4]]
-
-        labels = np.zeros((4, 32768, 30))
-        batch = np.zeros((120, 224, 224, 3))
-        for j in range(10):
-            batch[(4 * j), :] = fH5["%s/imageData" % idList[pos1[j]]]
-            batch[(4 * j + 1), :] = fH5["%s/imageData" % idList[pos2[j]]]
-            batch[(4 * j + 2), :] = fH5["%s/imageData" % idList[pos3[j]]]
-            batch[(4 * j + 3), :] = fH5["%s/imageData" % idList[pos4[j]]]
-        for k in range(20):
-            batch[(4 * k + 40), :] = fH5["%s/imageData" % idList[neg1[k]]]
-            batch[(4 * k + 41), :] = fH5["%s/imageData" % idList[neg2[k]]]
-            batch[(4 * k + 42), :] = fH5["%s/imageData" % idList[neg3[k]]]
-            batch[(4 * k + 43), :] = fH5["%s/imageData" % idList[neg4[k]]]
         output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
         for j in range(30):
-            labels[:, :, j] = output[(4 * j) : (4 * j + 4), :]
+            labels[:, :, j] = output[(batch_size * j) : (batch_size * j + batch_size), :]
 
         yield x, labels, z
-
-        idx1 += 4
-        idx2 += 4
-        idx3 += 4
-        idx4 += 4 
     fH5.close()
     return

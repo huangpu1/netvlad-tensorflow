@@ -7,7 +7,7 @@ import os
 
 batch_size = 4
 numEpoch = 30
-checkpoint_dir = "checkpoing"
+checkpoint_dir = "checkpoint"
 data_dir = "247query_subset_v2"
 h5File = "index_dir/datafile.hdf5"
 
@@ -43,14 +43,16 @@ with tf.device('/gpu:0'):
     sess.run(tf.global_variables_initializer())
 
     loss = triplet_loss(model.vlad_output, labels, 0.1)
-    train = tf.train.GradientDescentOptimizer(0.001).minimize(loss)
+
     train_loss = 0
+    lr = 0.001
     
 
     count = 0
     print("training begins!\n")
     for i in range(numEpoch):
-        for x, y, z in utils.next_batch(sess, model, data_dir, h5File, idList):
+        train = tf.train.MomentumOptimizer(lr, 0.9).minimize(loss)
+        for x, y, z in utils.next_batch(sess, model, batch_size, data_dir, h5File, idList):
             if count >= 50:
                 count = 0
                 utils.index_update(sess, model, data_dir, h5File, idList)
@@ -60,4 +62,5 @@ with tf.device('/gpu:0'):
                 print("Epoch: %d    progress: %.4f  training_loss = %.6f\n" % (i, z, train_loss))
         if (i + 1) % 5 == 0:
             model.save_npy(sess, "%s/netvlad_epoch_%d_loss_%.6f" % (checkpoint_dir, i, train_loss))
+            lr = lr / 2
 
