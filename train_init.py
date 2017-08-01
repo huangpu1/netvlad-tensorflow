@@ -63,7 +63,7 @@ def single_compute(fH5, qList, distMat, idxS, idxE):
             fH5.create_dataset("%s/negatives" % ID, (20, ), dtype = 'i')
         if not "potential_negatives" in fH5[ID]:
             fH5.create_dataset("%s/potential_negatives" % ID, (300, ), dtype = 'i')
-        print("checkpoint")
+
         pos = fH5["%s/positives" % ID]
         neg = fH5["%s/negatives" % ID]
         pneg = fH5["%s/potential_negatives" % ID]
