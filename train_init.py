@@ -4,6 +4,7 @@ import numpy as np
 import scipy.io as sio
 import h5py
 import thread
+from multiprocessing import Pool
 
 import train_utils
 
@@ -105,10 +106,14 @@ def index_initial(h5File, qList, dbList):
     numProc = 8
     qBlock = len(qList) / numProc
 
+    p = Pool(numProc)
     for i in range(numProc):
         idxS = qBlock * i
         idxE = (i + 1) * qBlock
-        thread.start_new_thread(single_compute, (idxS, idxE, ))
+        # thread.start_new_thread(single_compute, (idxS, idxE, ))
+        p.apply_async(single_compute, (idxS, idxE, ))
+    p.close()
+    p.join()
 
     single_compute(numProc * qBlock, len(qList))
 
@@ -161,18 +166,24 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
             fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, idList[i])))
         return
 
+    p = Pool(numProc)
     for i in range(numProc):
         idxS = i * qBlock
         idxE = (i + 1) * qBlock
-        thread.start_new_thread(single_load, (qList, idxS, idxE, ))
-
+        # thread.start_new_thread(single_load, (qList, idxS, idxE, ))
+        p.apply_async(single_load, (qList, idxS, idxE))
+    p.close()
+    p.join()
     single_load(qList, numProc * qBlock, len(qList))
 
+    p = Pool(numProc)
     for i in range(numProc):
         idxS = i * dbBlock
         idxE = (i + 1) * dbBlock
-        thread.start_new_thread(single_load, (dbList, idxS, idxE, ))
-
+        # thread.start_new_thread(single_load, (dbList, idxS, idxE, ))
+        p.apply_async(single_load, (dbList, idxS, idxE))
+    p.close()
+    p.join()
     single_load(dbList, numProc * dbBlock, len(dbList))
     
     fH5.close()
