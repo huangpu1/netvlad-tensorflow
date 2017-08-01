@@ -112,7 +112,7 @@ def index_initial(h5File, qList, dbList):
         idxE = (i + 1) * qBlock
         thread.start_new_thread(single_compute, (fH5, qList, distMat, idxS, idxE))
 
-    single_compute(fH5, qList, distMat, numThread * qBlock, len(qList)))
+    single_compute(fH5, qList, distMat, numThread * qBlock, len(qList))
 
         
 
