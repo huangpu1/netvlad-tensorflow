@@ -42,6 +42,7 @@ def compute_dist(mat_path, h5_file):
         distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc, axis = 1)
         if i % 100 == 0:
             print("progress: %.4f" % (i / numQ))
+            print(i)
     fH5.close()
 
     return qList, dbList
