@@ -54,49 +54,67 @@ def h5_initial(train_h5File):
 def index_initial(h5File, qList, dbList):
     fH5 = h5py.File(h5File, 'r+')
     distMat = fH5['distance_matrix']
-    for i, ID in enumerate(qList):
-        print("progress: %.4f" % (float(i) / len(qList)))
-        if not ID in fH5:
-            fH5.create_group(ID)
-        if not "positives" in fH5[ID]:
-            fH5.create_dataset("%s/positives" % ID, (10, ), dtype = 'i')
-        if not "negatives" in fH5[ID]:
-            fH5.create_dataset("%s/negatives" % ID, (20, ), dtype = 'i')
-        if not "potential_negatives" in fH5[ID]:
-            fH5.create_dataset("%s/potential_negatives" % ID, (300, ), dtype = 'i')
-        
-        pos = fH5["%s/positives" % ID]
-        neg = fH5["%s/negatives" % ID]
-        pneg = fH5["%s/potential_negatives" % ID]
 
-        posDic = {}
-        negDic = {}
+    numThread = 16
+    qBlock = len(qList) / numThread
 
-        for j, dist in enumerate(distMat[i, :]):
-            if dist >= 0 and dist <= 10:
+    def single_compute(fH5, qList, distMat, idxS, idxE):
+        for i in range(idxS, idxE):
+            if i % 10 == 0:
+                print("computing idx of image %s" % i)
+            ID = qList[i]
+            if not ID in fH5:
+                fH5.create_group(ID)
+            if not "positives" in fH5[ID]:
+                fH5.create_dataset("%s/positives" % ID, (10, ), dtype = 'i')
+            if not "negatives" in fH5[ID]:
+                fH5.create_dataset("%s/negatives" % ID, (20, ), dtype = 'i')
+            if not "potential_negatives" in fH5[ID]:
+                fH5.create_dataset("%s/potential_negatives" % ID, (300, ), dtype = 'i')
+
+            pos = fH5["%s/positives" % ID]
+            neg = fH5["%s/negatives" % ID]
+            pneg = fH5["%s/potential_negatives" % ID]
+
+            posDic = {}
+            negDic = {}
+
+            for j, dist in enumerate(distMat[i, :]):
+                if dist >= 0 and dist <= 10:
                 posDic['%s' % j] = dist
             elif dist > 25:
                 negDic['%s' % j] = dist
 
-        posSorted = sorted(posDic.items(), key = lambda e:e[1])
-        negSorted = sorted(negDic.items(), key = lambda e:e[1])
+            posSorted = sorted(posDic.items(), key = lambda e:e[1])
+            negSorted = sorted(negDic.items(), key = lambda e:e[1])
 
-        if len(posDic) >= 10:
-            for k in range(10):
-                pos[k] = int(posSorted[k][0])
-        else:
-            for k in range(len(posSorted)):
-                pos[k] = int(posSorted[k][0])
-            for k in range(len(posSorted), 10):
-                pos[k] = pos[k - 1]
+            if len(posDic) >= 10:
+                for k in range(10):
+                    pos[k] = int(posSorted[k][0])
+            else:
+                for k in range(len(posSorted)):
+                    pos[k] = int(posSorted[k][0])
+                for k in range(len(posSorted), 10):
+                    pos[k] = pos[k - 1]
         
-        for k in range(300):
-            pneg[k] = int(negSorted[k][0])
+            for k in range(300):
+                pneg[k] = int(negSorted[k][0])
 
-        for k in range(10):
-            neg[k] = int(negSorted[k][0])
-        for k in range(10, 20):
-            neg[k] = neg[k - 10]
+            for k in range(10):
+                neg[k] = int(negSorted[k][0])
+            for k in range(10, 20):
+                neg[k] = neg[k - 10]
+
+        return
+
+    for i in range(numThread):
+        idxS = qBlock * i
+        idxE = (i + 1) * qBlock
+        thread.start_new_thread(single_compute, (fH5, qList, distMat, idxS, idxE))
+
+    thread.start_new_thread(single_compute(fH5, qList, distMat, numThread * qBlock, len(qList)))
+
+        
 
     for i, ID in enumerate(dbList):
         if not ID in fH5:
