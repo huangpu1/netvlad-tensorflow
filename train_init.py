@@ -143,15 +143,6 @@ def load_image(data_dir, h5File, qList, dbList):
 
     return
 
-def single_load(data_dir, fH5, idList, idxS, idxE):
-    for i in range(idxS, idxE):
-        if i % 100 == 0:
-            print("image %s loaded" % i)
-        ID = idList[i]
-        if not "imageData" in fH5[ID]:
-            fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
-        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, idList[i])))
-    return
     
 def multipro_load_image(data_dir, h5File, qList, dbList):
     print("loading query image data...\n")
@@ -160,6 +151,16 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     numProc = 8
     qBlock = len(qList) / (numProc)
     dbBlock = len(dbList) / (numProc)
+
+    def single_load(data_dir, fH5, idList, idxS, idxE):
+        for i in range(idxS, idxE):
+            if i % 100 == 0:
+                print("image %s loaded" % i)
+            ID = idList[i]
+            if not "imageData" in fH5[ID]:
+                fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
+            fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, idList[i])))
+        return
 
     for i in range(numProc):
         idxS = i * qBlock
