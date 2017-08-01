@@ -54,7 +54,7 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
     numQ = len(qList)
     numDB = len(dbList)
     descriptorQ = np.zeros((numQ, 32768))
-    descriptorDB = np.zeros((numDB, 32768)
+    descriptorDB = np.zeros((numDB, 32768))
     L2_distance = np.zeros((numQ, numDB))
 
     batch = np.zeros((batch_size, 224, 224, 3))
