@@ -113,6 +113,7 @@ def index_initial(h5File, qList, dbList):
     for i in range(numProc):
         idxS = qBlock * i
         idxE = (i + 1) * qBlock
+        print("checkpoint1")
         p.apply_async(single_compute, args = (fH5, qList, distMat, idxS, idxE, ))
     p.close()
     p.join()
