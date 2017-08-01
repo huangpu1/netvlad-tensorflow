@@ -37,10 +37,9 @@ def compute_dist(mat_path, h5_file):
         fH5.create_dataset('distance_matrix', shape = (numQ, numDB), dtype = 'f')
     print("check4")
     distMat = fH5['distance_matrix']
-
+    print("num of query images: %s" % numQ)
     for i in range(numQ):
-        print("check5")
-        if i % 50 == 0:
+        if i % 100 == 0:
             print("progress: %.4f" % (i / numQ))
         distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc[:, :], axis = 1)
     fH5.close()
