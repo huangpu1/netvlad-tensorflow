@@ -149,7 +149,7 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     for i in range(numThread):
         idxS = i * qBlock
         idxE = (i + 1) * qBlock
-        thread.start_new_thread(single_load, data_dir, fH5, qList, idxS, idxE)
+        thread.start_new_thread(single_load, (data_dir, fH5, qList, idxS, idxE))
     for i in range(numThread * qBlock, len(qList)):
         ID = qList[i]
         if not "imageData" in fH5[ID]:
@@ -159,7 +159,7 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     for i in range(numThread):
         idxS = i * dbBlock
         idxE = (i + 1) * dbBlock
-        thread.start_new_thread(single_load, data_dir, fH5, dbList, idxS, idxE)
+        thread.start_new_thread(single_load, (data_dir, fH5, dbList, idxS, idxE))
     for i in range(numThread * qBlock, len(dbList)):
         ID = dbList[i]
         if not "imageData" in fH5[ID]:
