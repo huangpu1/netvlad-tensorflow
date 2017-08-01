@@ -20,30 +20,21 @@ def get_List(mat_path):
 
 def compute_dist(mat_path, h5_file):
     boxes = sio.loadmat(mat_path)["dbStruct"]
-    print("check1")
+
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
     dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0]]
-    print("check2")
+
     qLoc = boxes["utmQ"][0, 0].transpose()
     dbLoc = boxes["utmDb"][0, 0].transpose()
-    print(qLoc.shape)
-    print(dbLoc.shape)
 
     fH5 = h5py.File(h5_file, "r+")
-    print("check3")
     numQ = len(qList)
     numDB = len(dbList)
     if not "distance_matrix" in fH5:
         fH5.create_dataset('distance_matrix', shape = (numQ, numDB), dtype = 'f')
-    print("check4")
     distMat = fH5['distance_matrix']
-    print("num of query images: %s" % numQ)
-    print(type(numQ))
     for i in range(numQ):
         distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc, axis = 1)
-        if i % 100 == 0:
-            print("progress: %.4f" % (i / numQ))
-            print(i)
     fH5.close()
 
     return qList, dbList
@@ -63,6 +54,7 @@ def index_initial(h5File, qList, dbList):
     fH5 = h5py.File(h5File, 'r+')
     distMat = fH5['distance_matrix']
     for i, ID in enumerate(qList):
+        print("progress: %.4f" % (float(i) / len(qList)))
         if not ID in fH5:
             fH5.create_group(ID)
         if not "positives" in fH5[ID]:
@@ -117,14 +109,16 @@ def load_image(data_dir, h5File, qList, dbList):
     print("Loading query image data...\n")
     fH5 = h5py.File(h5File, 'r+')
     for i, ID in enumerate(qList):
-        print("progress %.4f\n" % (i / len(qList) * 100))
+        if i % 10 == 0:
+            print("progress %.4f\n" % (float(i) / len(qList) * 100))
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
         fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, qList[i])))
 
     print("Loading database image data...\n")
     for i, ID in enumerate(dbList):
-        print("progress %.4f%%\n" % (i / len(dbList) * 100))
+        if i % 10 == 0
+            print("progress %.4f%%\n" % (float(i) / len(dbList) * 100))
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
         fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, dbList[i])))
