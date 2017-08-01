@@ -27,6 +27,7 @@ def compute_dist(mat_path, h5_file):
     qLoc = boxes["utmQ"][0, 0].transpose()
     dbLoc = boxes["utmDb"][0, 0].transpose()
     print(qLoc.shape)
+    print(dbLoc.shape)
 
     fH5 = h5py.File(h5_file, "r+")
     print("check3")
