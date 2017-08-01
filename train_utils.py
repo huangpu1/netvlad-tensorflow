@@ -74,6 +74,8 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
 
     numBatchDB = int(math.floor(len(dbList) / batch_size))
     for i in range(numBatchDB):
+        if i % 10 == 0:
+            print("database image progress: %s\n" % (float(i) / numBatchQ))
         for j in range(batch_size):
             ID = dbList[i * batch_size + j]
             batch[j, :] = fH5["%s/imageData" % ID]
