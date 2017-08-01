@@ -50,58 +50,57 @@ def h5_initial(train_h5File):
 
     return
 
-def single_compute(fH5, qList, distMat, idxS, idxE):
-    for i in range(idxS, idxE):
-        if i % 10 == 0:
-            print("computing idx of image %s" % i)
-        ID = qList[i]
-        if not ID in fH5:
-            fH5.create_group(ID)
-        if not "positives" in fH5[ID]:
-            fH5.create_dataset("%s/positives" % ID, (10, ), dtype = 'i')
-        if not "negatives" in fH5[ID]:
-            fH5.create_dataset("%s/negatives" % ID, (20, ), dtype = 'i')
-        if not "potential_negatives" in fH5[ID]:
-            fH5.create_dataset("%s/potential_negatives" % ID, (300, ), dtype = 'i')
-
-        pos = fH5["%s/positives" % ID]
-        neg = fH5["%s/negatives" % ID]
-        pneg = fH5["%s/potential_negatives" % ID]
-
-        posDic = {}
-        negDic = {}
-
-        for j, dist in enumerate(distMat[i, :]):
-            if dist >= 0 and dist <= 10:
-                posDic['%s' % j] = dist
-            elif dist > 25:
-                negDic['%s' % j] = dist
-
-        posSorted = sorted(posDic.items(), key = lambda e:e[1])
-        negSorted = sorted(negDic.items(), key = lambda e:e[1])
-
-        if len(posDic) >= 10:
-            for k in range(10):
-                pos[k] = int(posSorted[k][0])
-        else:
-            for k in range(len(posSorted)):
-                pos[k] = int(posSorted[k][0])
-            for k in range(len(posSorted), 10):
-                pos[k] = pos[k - 1]
-        
-        for k in range(300):
-            pneg[k] = int(negSorted[k][0])
-
-        for k in range(10):
-            neg[k] = int(negSorted[k][0])
-        for k in range(10, 20):
-            neg[k] = neg[k - 10]
-
-    return
-
 def index_initial(h5File, qList, dbList):
     fH5 = h5py.File(h5File, 'r+')
     distMat = fH5['distance_matrix']
+
+    def single_compute(idxS, idxE):
+        for i in range(idxS, idxE):
+            if i % 10 == 0:
+                print("computing idx of image %s" % i)
+            ID = qList[i]
+            if not ID in fH5:
+                fH5.create_group(ID)
+            if not "positives" in fH5[ID]:
+                fH5.create_dataset("%s/positives" % ID, (10, ), dtype = 'i')
+            if not "negatives" in fH5[ID]:
+                fH5.create_dataset("%s/negatives" % ID, (20, ), dtype = 'i')
+            if not "potential_negatives" in fH5[ID]:
+                fH5.create_dataset("%s/potential_negatives" % ID, (300, ), dtype = 'i')
+
+            pos = fH5["%s/positives" % ID]
+            neg = fH5["%s/negatives" % ID]
+            pneg = fH5["%s/potential_negatives" % ID]
+
+            posDic = {}
+            negDic = {}
+
+            for j, dist in enumerate(distMat[i, :]):
+                if dist >= 0 and dist <= 10:
+                    posDic['%s' % j] = dist
+                elif dist > 25:
+                    negDic['%s' % j] = dist
+
+            posSorted = sorted(posDic.items(), key = lambda e:e[1])
+            negSorted = sorted(negDic.items(), key = lambda e:e[1])
+
+            if len(posDic) >= 10:
+                for k in range(10):
+                    pos[k] = int(posSorted[k][0])
+            else:
+                for k in range(len(posSorted)):
+                    pos[k] = int(posSorted[k][0])
+                for k in range(len(posSorted), 10):
+                    pos[k] = pos[k - 1]
+        
+            for k in range(300):
+                pneg[k] = int(negSorted[k][0])
+
+            for k in range(10):
+                neg[k] = int(negSorted[k][0])
+            for k in range(10, 20):
+                neg[k] = neg[k - 10]
+        return
 
     numProc = 8
     qBlock = len(qList) / numProc
@@ -109,9 +108,9 @@ def index_initial(h5File, qList, dbList):
     for i in range(numProc):
         idxS = qBlock * i
         idxE = (i + 1) * qBlock
-        thread.start_new_thread(single_compute, (fH5, qList, distMat, idxS, idxE, ))
+        thread.start_new_thread(single_compute, (idxS, idxE, ))
 
-    single_compute(fH5, qList, distMat, numProc * qBlock, len(qList))
+    single_compute(numProc * qBlock, len(qList))
 
     for i, ID in enumerate(dbList):
         if not ID in fH5:
@@ -121,7 +120,7 @@ def index_initial(h5File, qList, dbList):
 
     return
 
-def load_image(data_dir, h5File, qList, dbList):
+"""def load_image(data_dir, h5File, qList, dbList):
     print("Loading query image data...\n")
     fH5 = h5py.File(h5File, 'r+')
     for i, ID in enumerate(qList):
@@ -141,7 +140,7 @@ def load_image(data_dir, h5File, qList, dbList):
     fH5.close()
     print("Done!\n")
 
-    return
+    return"""
 
     
 def multipro_load_image(data_dir, h5File, qList, dbList):
@@ -152,7 +151,7 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     qBlock = len(qList) / (numProc)
     dbBlock = len(dbList) / (numProc)
 
-    def single_load(data_dir, fH5, idList, idxS, idxE):
+    def single_load(idList, idxS, idxE):
         for i in range(idxS, idxE):
             if i % 100 == 0:
                 print("image %s loaded" % i)
@@ -165,16 +164,16 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     for i in range(numProc):
         idxS = i * qBlock
         idxE = (i + 1) * qBlock
-        thread.start_new_thread(single_load, (data_dir, fH5, qList, idxS, idxE, ))
+        thread.start_new_thread(single_load, (qList, idxS, idxE, ))
 
-    single_load(data_dir, fH5, qList, numProc * qBlock, len(qList))
+    single_load(qList, numProc * qBlock, len(qList))
 
     for i in range(numProc):
         idxS = i * dbBlock
         idxE = (i + 1) * dbBlock
-        thread.start_new_thread(single_load, (data_dir, fH5, dbList, idxS, idxE, ))
+        thread.start_new_thread(single_load, (dbList, idxS, idxE, ))
 
-    single_load(data_dir, fH5, dbList, numProc * dbBlock, len(dbList))
+    single_load(dbList, numProc * dbBlock, len(dbList))
     
     fH5.close()
     print("Done!\n")
