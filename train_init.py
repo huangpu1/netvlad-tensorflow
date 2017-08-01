@@ -81,9 +81,9 @@ def index_initial(h5File, qList, dbList):
 
             for j, dist in enumerate(distMat[i, :]):
                 if dist >= 0 and dist <= 10:
-                posDic['%s' % j] = dist
-            elif dist > 25:
-                negDic['%s' % j] = dist
+                    posDic['%s' % j] = dist
+                elif dist > 25:
+                    negDic['%s' % j] = dist
 
             posSorted = sorted(posDic.items(), key = lambda e:e[1])
             negSorted = sorted(negDic.items(), key = lambda e:e[1])
