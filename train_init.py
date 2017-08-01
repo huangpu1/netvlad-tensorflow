@@ -40,7 +40,7 @@ def compute_dist(mat_path, h5_file):
 
     for i in range(numQ):
         print("check5")
-        distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc[:, :], axis = 0)
+        distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc[:, :], axis = 1)
     fH5.close()
 
     return qList, dbList
