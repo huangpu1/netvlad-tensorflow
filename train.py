@@ -50,7 +50,7 @@ with tf.device('/gpu:0'):
     for i in range(numEpoch):
         
         for x, y, z in train_utils.next_batch(sess, model, batch_size, train_h5File, qList, dbList):
-            if count >= 150:
+            if count >= 10:
                 count = 0
                 train_utils.index_update(sess, model, batch_size * 30, train_h5File, qList, dbList)
             count = count + 1
