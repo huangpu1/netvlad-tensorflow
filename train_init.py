@@ -26,6 +26,7 @@ def compute_dist(mat_path, h5_file):
     print("check2")
     qLoc = boxes["utmQ"][0, 0].transpose()
     dbLoc = boxes["utmDb"][0, 0].transpose()
+    print(qLoc.shape)
 
     fH5 = h5py.File(h5_file, "r+")
     print("check3")
@@ -38,7 +39,7 @@ def compute_dist(mat_path, h5_file):
 
     for i in range(numQ):
         print("check5")
-        distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc, axis = 0)
+        distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc[:, :], axis = 0)
     fH5.close()
 
     return qList, dbList
