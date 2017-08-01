@@ -3,6 +3,7 @@ import math
 import numpy as np
 import scipy.io as sio
 import h5py
+import thread
 
 import train_utils
 
@@ -125,4 +126,44 @@ def load_image(data_dir, h5File, qList, dbList):
     fH5.close()
     print("Done!\n")
 
+    return
+
+def multipro_load_image(data_dir, h5File, qList, dbList):
+    print("loading query image data...\n")
+    fH5 = h5py.File(h5File, 'r+')
+
+    numThread = 4
+    qBlock = len(qList) / (numThread)
+    dbBlock = len(dbList) / (numThread)
+
+    def single_load(data_dir, fH5, idList, idxS, idxE):
+        for i in range(idxS, idxE):
+            if i % 10 == 0:
+                print("image %s loaded" % i)
+            ID = idList[i]
+            if not "imageData" in fH5[ID]:
+                fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
+            fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, idList[i])))
+        return
+
+    for i in range(numThread):
+        idxS = i * qBlock
+        idxE = (i + 1) * qBlock
+        thread.start_new_thread(single_load, data_dir, fH5, qList, idxS, idxE)
+    for i in range(numThread * qBlock, len(qList)):
+        ID = qList[i]
+        if not "imageData" in fH5[ID]:
+            fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
+        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, qList[i])))
+
+    for i in range(numThread):
+        idxS = i * dbBlock
+        idxE = (i + 1) * dbBlock
+        thread.start_new_thread(single_load, data_dir, fH5, dbList, idxS, idxE)
+    for i in range(numThread * qBlock, len(dbList)):
+        ID = dbList[i]
+        if not "imageData" in fH5[ID]:
+            fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
+        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, dbList[i])))
+        
     return

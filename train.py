@@ -15,7 +15,7 @@ mat_path = "tokyoTM/tokyoTM_train.mat"
 train_init.h5_initial(train_h5File)
 qList, dbList = train_init.compute_dist(mat_path, train_h5File)
 train_init.index_initial(train_h5File, qList, dbList)
-train_init.load_image(data_dir, train_h5File, qList, dbList)
+train_init.multipro_load_image(data_dir, train_h5File, qList, dbList)
 
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
