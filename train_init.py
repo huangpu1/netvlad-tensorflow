@@ -12,14 +12,14 @@ def cut_extension(fileName):
     return name
 
 def get_List(mat_path):
-    boxes = sio.loadmat("mat_path")["dbStruct"]
+    boxes = sio.loadmat(mat_path)["dbStruct"]
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
     dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0]]
 
     return qList, dbList
 
 def compute_dist(mat_path, h5_file):
-    boxes = sio.loadmat("mat_path")["dbStruct"]
+    boxes = sio.loadmat(mat_path)["dbStruct"]
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
     dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0]]
     qLoc = boxes["utmQ"][0, 0]
@@ -107,13 +107,17 @@ def index_initial(h5File, qList, dbList):
     return
 
 def load_image(data_dir, h5File, qList, dbList):
-    print("Loading image data...\n")
+    print("Loading query image data...\n")
     fH5 = h5py.File(h5File, 'r+')
     for i, ID in enumerate(qList):
+        print("progress %.4f\n" % (i / len(qList) * 100))
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
         fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, qList[i])))
+
+    print("Loading database image data...\n")
     for i, ID in enumerate(dbList):
+        print("progress %.4f%%\n" % (i / len(dbList) * 100))
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
         fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, dbList[i])))

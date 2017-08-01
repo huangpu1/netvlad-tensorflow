@@ -100,7 +100,7 @@ def next_batch(sess, model, batch_size, h5File, qList, dbList):
     fH5 = h5py.File(h5File, 'r+')
     idx = random.randint(0, numQ - 1)
     for i in range(int(numBatch + 1)):
-        z = i / numBatch
+        z = i / numBatch * 100
         x = np.zeros((batch_size, 224, 224, 3))
         labels = np.zeros((batch_size, 32768, 30))
         batch = np.zeros((batch_size * 30, 224, 224, 3))
