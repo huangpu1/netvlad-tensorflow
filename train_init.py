@@ -28,15 +28,16 @@ def compute_dist(mat_path, h5_file):
     dbLoc = boxes["utmDb"][0, 0]
 
     fH5 = h5py.File(h5_file, "r+")
-
+    print("check3")
     numQ = len(qList)
     numDB = len(dbList)
     if not "distance_matrix" in fH5:
         fH5.create_dataset('distance_matrix', shape = (numQ, numDB), dtype = 'f')
-
+    print("check4")
     distMat = fH5['distance_matrix']
 
     for i in range(numQ):
+        print("check5")
         for j in range(numDB):
             distMat[i, j] = np.linalg.norm(qLoc[:, i] - dbLoc[:, j])
     fH5.close()
