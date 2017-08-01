@@ -43,15 +43,16 @@ with tf.device('/gpu:0'):
     sess.run(tf.global_variables_initializer())
 
     loss = triplet_loss(model.vlad_output, labels, 0.1)
-
-    train_loss = 0
     lr = 0.001
+    train = tf.train.GradientDescentOptimizer(lr).minimize(loss)
+    train_loss = 0
+    
     
 
     count = 0
     print("training begins!\n")
     for i in range(numEpoch):
-        train = tf.train.MomentumOptimizer(lr, 0.9).minimize(loss)
+        
         for x, y, z in utils.next_batch(sess, model, batch_size, data_dir, h5File, idList):
             if count >= 50:
                 count = 0
