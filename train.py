@@ -12,9 +12,10 @@ data_dir = "tokyoTM/image"
 train_h5File = "index/traindata.hdf5"
 mat_path = "tokyoTM/tokyoTM_train.mat"
 
-train_init.h5_initial(train_h5File)
+qList, dbList = train_init.get_List(mat_path)
+"""train_init.h5_initial(train_h5File)
 qList, dbList = train_init.compute_dist(mat_path, train_h5File)
-train_init.index_initial(train_h5File, qList, dbList)
+train_init.index_initial(train_h5File, qList, dbList)"""
 train_init.multipro_load_image(data_dir, train_h5File, qList, dbList)
 
 def triplet_loss(q, labels, m):
