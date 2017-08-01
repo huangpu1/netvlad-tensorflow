@@ -1,26 +1,21 @@
 import tensorflow as tf
 
 import netvlad
-import utils
-import initial
+import train_utils
+import train_init
 import os
 
 batch_size = 4
 numEpoch = 30
 checkpoint_dir = "checkpoint"
-data_dir = "247query_subset_v2"
-h5File = "index_dir/datafile.hdf5"
+data_dir = "tokyoTM/image"
+train_h5File = "index/traindata.hdf5"
+mat_path = "tokyoTM/tokyoTM_train.mat"
 
-if not os.path.exists(checkpoint_dir):
-    os.mkdir(checkpoint_dir)
-"""
-initial.h5_initial()
-idList = initial.compute_dist(data_dir, h5File)
-initial.index_initial(h5File, idList)
-"""
-
-idList = initial.get_idList(data_dir)
-# initial.load_image(data_dir, h5File, idList)
+train_init.h5_initial(train_h5File)
+qList, dbList = train_init.compute_dist(mat_path, train_h5File)
+train_init.index_initial(train_h5File, qList, dbList)
+train_init.load_image(data_dir, train_h5File, qList, dbList)
 
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
@@ -53,10 +48,10 @@ with tf.device('/gpu:0'):
     print("training begins!\n")
     for i in range(numEpoch):
         
-        for x, y, z in utils.next_batch(sess, model, batch_size, data_dir, h5File, idList):
+        for x, y, z in train_utils.next_batch(sess, model, batch_size, train_h5File, qList, dbList):
             if count >= 50:
                 count = 0
-                utils.index_update(sess, model, batch_size * 30, data_dir, h5File, idList)
+                train_utils.index_update(sess, model, batch_size * 30, train_h5File, qList, dbList)
             count = count + 1
             _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
             if count % 1 == 0:
