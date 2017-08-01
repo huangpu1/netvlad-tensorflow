@@ -8,7 +8,7 @@ import os
 batch_size = 4
 numEpoch = 30
 checkpoint_dir = "checkpoint"
-data_dir = "tokyoTM/image"
+data_dir = "tokyoTM/images"
 train_h5File = "index/traindata.hdf5"
 mat_path = "tokyoTM/tokyoTM_train.mat"
 
