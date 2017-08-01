@@ -20,8 +20,10 @@ def get_List(mat_path):
 
 def compute_dist(mat_path, h5_file):
     boxes = sio.loadmat(mat_path)["dbStruct"]
+    print("check1")
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
     dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0]]
+    print("check2")
     qLoc = boxes["utmQ"][0, 0]
     dbLoc = boxes["utmDb"][0, 0]
 
