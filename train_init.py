@@ -132,7 +132,7 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     print("loading query image data...\n")
     fH5 = h5py.File(h5File, 'r+')
 
-    numThread = 4
+    numThread = 16
     qBlock = len(qList) / (numThread)
     dbBlock = len(dbList) / (numThread)
 
