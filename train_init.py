@@ -114,7 +114,7 @@ def load_image(data_dir, h5File, qList, dbList):
             print("progress %.4f\n" % (float(i) / len(qList) * 100))
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
-        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, qList[i])))
+        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, qList[i])))
 
     print("Loading database image data...\n")
     for i, ID in enumerate(dbList):
@@ -122,7 +122,7 @@ def load_image(data_dir, h5File, qList, dbList):
             print("progress %.4f%%\n" % (float(i) / len(dbList) * 100))
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
-        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, dbList[i])))
+        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, dbList[i])))
     fH5.close()
     print("Done!\n")
 
@@ -143,7 +143,7 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
             ID = idList[i]
             if not "imageData" in fH5[ID]:
                 fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
-            fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, idList[i])))
+            fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, idList[i])))
         return
 
     for i in range(numThread):
@@ -154,7 +154,7 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
         ID = qList[i]
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
-        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, qList[i])))
+        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, qList[i])))
 
     for i in range(numThread):
         idxS = i * dbBlock
@@ -164,6 +164,6 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
         ID = dbList[i]
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
-        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s.jpg" % (data_dir, dbList[i])))
+        fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, dbList[i])))
         
     return
