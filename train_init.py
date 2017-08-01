@@ -112,7 +112,7 @@ def index_initial(h5File, qList, dbList):
     for i in range(numProc):
         idxS = qBlock * i
         idxE = (i + 1) * qBlock
-        p.apply_async(single_compute, args = (fH5, qList, distMat, idxS, idxE))
+        p.apply_async(single_compute, args = (fH5, qList, distMat, idxS, idxE, ))
     p.close()
     p.join()
 
@@ -170,7 +170,7 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     for i in range(numProc):
         idxS = i * qBlock
         idxE = (i + 1) * qBlock
-        p.apply_async(single_load, (data_dir, fH5, qList, idxS, idxE))
+        p.apply_async(single_load, (data_dir, fH5, qList, idxS, idxE, ))
     p.close()
     p.join()
 
@@ -180,10 +180,12 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     for i in range(numProc):
         idxS = i * dbBlock
         idxE = (i + 1) * dbBlock
-        p.apply_async(single_load, (data_dir, fH5, dbList, idxS, idxE))
+        p.apply_async(single_load, (data_dir, fH5, dbList, idxS, idxE, ))
     p.close()
     p.join()
 
     single_load(data_dir, fH5, dbList, numProc * dbBlock, len(dbList))
-        
+    
+    fH5.close()
+    print("Done!\n")
     return
