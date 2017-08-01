@@ -51,15 +51,19 @@ def load_image2(path, height=None, width=None):
 def index_update(sess, model, batch_size, h5File, qList, dbList):
     print("Updating positives and negatives...\n")
     fH5 = h5py.File(h5File, 'r+')
-    descriptorQ = np.zeros((len(qList), 32768))
-    descriptorDB = np.zeros((len(dbList)), 32768)
-    L2_distance = np.zeros((len(qList), len(dbList)))
+    numQ = len(qList)
+    numDB = len(dbList)
+    descriptorQ = np.zeros((numQ, 32768))
+    descriptorDB = np.zeros((numDB, 32768)
+    L2_distance = np.zeros((numQ, numDB)
 
     batch = np.zeros((batch_size, 224, 224, 3))
     single = np.zeros((1, 224, 224, 3))
 
     numBatchQ = int(math.floor(len(qList) / batch_size))
     for i in range(numBatchQ):
+        if i % 10 == 0:
+            print("query image progress: %s\n" % (float(i) / numBatchQ))
         for j in range(batch_size):
             ID = qList[i * batch_size + j]
             batch[j, :] = fH5["%s/imageData" % ID]
