@@ -131,10 +131,6 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     print("loading query image data...\n")
     fH5 = h5py.File(h5File, 'r+')
 
-    numProc = 4
-    qBlock = len(qList) / (numProc)
-    dbBlock = len(dbList) / (numProc)
-
     def single_load(idList, idxS, idxE):
         for i in range(idxS, idxE):
             if i % 100 == 0:
@@ -145,17 +141,9 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
             fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, idList[i])))
         return
 
-    for i in range(numProc):
-        idxS = i * qBlock
-        idxE = (i + 1) * qBlock
-        thread.start_new_thread(single_load, (qList, idxS, idxE, ))
-    single_load(qList, numProc * qBlock, len(qList))
+    single_load(qList, 0, len(qList))
 
-    for i in range(numProc):
-        idxS = i * dbBlock
-        idxE = (i + 1) * dbBlock
-        thread.start_new_thread(single_load, (dbList, idxS, idxE, ))
-    single_load(dbList, numProc * dbBlock, len(dbList))
+    single_load(dbList, 0, len(dbList))
     
     fH5.close()
     print("Done!\n")
