@@ -148,13 +148,13 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
     for i in range(numProc):
         idxS = i * qBlock
         idxE = (i + 1) * qBlock
-        thread.start_new_thread(single_load, (qList, idxS, idxE， ))
+        thread.start_new_thread(single_load, (qList, idxS, idxE, ))
     single_load(qList, numProc * qBlock, len(qList))
 
     for i in range(numProc):
         idxS = i * dbBlock
         idxE = (i + 1) * dbBlock
-        thread.start_new_thread(single_load, (dbList, idxS, idxE， ))
+        thread.start_new_thread(single_load, (dbList, idxS, idxE, ))
     single_load(dbList, numProc * dbBlock, len(dbList))
     
     fH5.close()
