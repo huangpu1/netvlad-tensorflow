@@ -117,7 +117,7 @@ def load_image(data_dir, h5File, qList, dbList):
 
     print("Loading database image data...\n")
     for i, ID in enumerate(dbList):
-        if i % 10 == 0
+        if i % 10 == 0:
             print("progress %.4f%%\n" % (float(i) / len(dbList) * 100))
         if not "imageData" in fH5[ID]:
             fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
