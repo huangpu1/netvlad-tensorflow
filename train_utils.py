@@ -84,7 +84,12 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
         single[0, :] = fH5["%s/imageData" % dbList[i]]
         descriptorDB[i, :] = sess.run(model.vlad_output, feed_dict = {'query_image:0': single, 'train_mode:0' : False})
 
-        
+    # compute mutual L2 distance between query and database
+    A = np.dot(descriptorQ, descriptorDB.transpose())
+    B = np.linalg.norm(descriptorQ, axis = 1, keepdims = True)
+    C = np.linalg.norm(descriptorDB, axis = 1)
+    L2_distance = np.sqrt(B + C - 2 * A)
+
     for i, ID in enumerate(qList):
         if i % 10 == 0:
             print("updating progress: %s" % (float(i) / len(qList)))
@@ -92,7 +97,7 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
         L2_dist = {}
         pneg = fH5["%s/potential_negatives" % ID]
         for j in pneg:
-            L2_dist[str(j)] = np.linalg.norm(descriptorQ[i, :] - descriptorDB[j, :])
+            L2_dist[str(j)] = L2_distance[i, j]
         L2Sorted = sorted(L2_dist.items(), key = lambda e : e[1])
 
         for k in range(10):
