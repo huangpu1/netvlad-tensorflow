@@ -5,6 +5,7 @@ import train_utils
 import train_init
 import os
 
+update_index_every = 150
 batch_size = 4
 numEpoch = 30
 checkpoint_dir = "checkpoint"
@@ -50,7 +51,7 @@ with tf.device('/gpu:0'):
     for i in range(numEpoch):
         
         for x, y, z in train_utils.next_batch(sess, model, batch_size, train_h5File, qList, dbList):
-            if count >= 150:
+            if count >= update_index_every:
                 count = 0
                 train_utils.index_update(sess, model, batch_size * 30, train_h5File, qList, dbList)
             count = count + 1
@@ -60,4 +61,5 @@ with tf.device('/gpu:0'):
         if (i + 1) % 5 == 0:
             model.save_npy(sess, "%s/netvlad_epoch_%d_loss_%.6f" % (checkpoint_dir, i, train_loss))
             lr = lr / 2
+            update_index_every *= 2
 
