@@ -68,30 +68,11 @@ def index_initial(h5File, qList, dbList):
         neg = fH5["%s/negatives" % ID]
         pneg = fH5["%s/potential_negatives" % ID]
 
-        posDic = {}
-        negDic = []
+        pos[:] = np.argsort(distMat[i, :])[:20]
 
-        for j, dist in enumerate(distMat[i, :]):
-            if dist >= 0 and dist <= 10:
-                posDic['%s' % j] = dist
-            elif dist >= 25:
-                negDic.append(j)
-
-        posSorted = sorted(posDic.items(), key = lambda e:e[1])
-
-        if len(posDic) >= 20:
-            for k in range(20):
-                pos[k] = int(posSorted[k][0])
-        else:
-            for k in range(len(posSorted)):
-                pos[k] = int(posSorted[k][0])
-            for k in range(len(posSorted), 20):
-                pos[k] = pos[k - 1]
-        
-        pneg[:] = random.sample(negDic, 1000)
-
-        neg[0:10] = random.sample(pneg, 10)
-        neg[10:20] = neg[0:10]
+        indices = np.where(distMat[i, :] >= 25)
+        pneg[:] = random.sample(indices, 1000)
+        neg[:] = random.sample(pneg, 20)
 
     for i, ID in enumerate(dbList):
         if not ID in fH5:

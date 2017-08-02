@@ -8,8 +8,6 @@ import tensorflow as tf
 import math
 import h5py
 import os
-import random
-import time
 
 
 # returns image of shape [224, 224, 3]
@@ -48,14 +46,14 @@ def load_image2(path, height=None, width=None):
         nx = img.shape[1]
     return skimage.transform.resize(img, (ny, nx))
 
-def index_update(sess, model, batch_size, h5File, qList, dbList, currentIdx):
-    print("Updating positives and negatives...\n")
+
+def evaluate(sess, model, batch_size, h5File, qList, dbList, numRecall):
     fH5 = h5py.File(h5File, 'r+')
+    distMat = fH5['distance_matrix']
     numQ = len(qList)
     numDB = len(dbList)
     descriptorQ = np.zeros((numQ, 32768))
     descriptorDB = np.zeros((numDB, 32768))
-    L2_distance = np.zeros((numQ, numDB))
 
     batch = np.zeros((batch_size, 224, 224, 3))
     single = np.zeros((1, 224, 224, 3))
@@ -90,57 +88,17 @@ def index_update(sess, model, batch_size, h5File, qList, dbList, currentIdx):
     C = np.linalg.norm(descriptorDB, axis = 1) ** 2
     L2_distance = np.sqrt(B + C - 2 * A)
 
-    for i in range(currentIdx, currentIdx + 600):
-        i = i % numQ
-        ID = qList[i]
-        if i % 10 == 0:
-            print("updating progress: %s" % (float(i - currentIdx) / 600))
-
-        neg = fH5["%s/negatives" % ID]
-        pneg = fH5["%s/potential_negatives" % ID]
-
-        indices = np.argsort(L2_distance[i, pneg[:]])[:10]
-
-        for k in range(10):
-            neg[10 + k] = neg[k]
-            neg[k] = pneg[indices[k]]
+    count = 0
+    accuracy = 0
+    for i in range(numQ):
+        if i % 20 == 0:
+            print("current accuracy: %.4f%%   evaluation progress: %.4f" % (accuracy, (float(i) / numQ)))
+        indices = np.argsort(L2_distance[i, :])[:numRecall]
+        for j in indices:
+            if distMat[i, j] <= 25:
+                count += 1
+                break
+        accuracy = float(count) / (i + 1)
     fH5.close()
     print("Done!\n")
-    return
-
-def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
-    numQ = len(qList)
-    numBatch = math.floor(numQ / batch_size)
-    fH5 = h5py.File(h5File, 'r+')
-
-    if idxS:
-        idx = random.randint(0, numQ - 1)        
-    else:
-        idx = 0
-
-    for i in range(int(numBatch + 1)):
-        z = i / numBatch * 100
-        x = np.zeros((batch_size, 224, 224, 3))
-        labels = np.zeros((batch_size, 32768, 40))
-        batch = np.zeros((batch_size * 40, 224, 224, 3))
-        for t in range(batch_size):
-            idx = idx % numQ
-            
-            # print("idx: %s" % idx)
-            x[t, :] = fH5["%s/imageData" % qList[idx]]
-            pos = fH5["%s/positives" % qList[idx]]
-            neg = fH5["%s/negatives" % qList[idx]]
-
-            for j in range(20):
-                batch[(batch_size * j + t), :] = fH5["%s/imageData" % dbList[pos[j]]]
-            for k in range(20):
-                batch[(batch_size * k + 20 * batch_size + t), :] = fH5["%s/imageData" % dbList[neg[k]]]
-            idx += 1
-
-        output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
-        for j in range(40):
-            labels[:, :, j] = output[(batch_size * j) : (batch_size * j + batch_size), :]
-
-        yield x, labels, z, idx
-    fH5.close()
     return
