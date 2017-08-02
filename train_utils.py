@@ -57,7 +57,7 @@ def index_update(sess, model, batch_size, h5File, qList, dbList, currentIdx):
     descriptorDB = np.zeros((numDB, 32768))
     L2_distance = np.zeros((numQ, numDB))
 
-    """batch = np.zeros((batch_size, 224, 224, 3))
+    batch = np.zeros((batch_size, 224, 224, 3))
     single = np.zeros((1, 224, 224, 3))
 
     numBatchQ = int(math.floor(len(qList) / batch_size))
@@ -88,7 +88,7 @@ def index_update(sess, model, batch_size, h5File, qList, dbList, currentIdx):
     A = np.dot(descriptorQ, descriptorDB.transpose())
     B = np.linalg.norm(descriptorQ, axis = 1, keepdims = True) ** 2
     C = np.linalg.norm(descriptorDB, axis = 1) ** 2
-    L2_distance = np.sqrt(B + C - 2 * A)"""
+    L2_distance = np.sqrt(B + C - 2 * A)
 
     for i in range(currentIdx, currentIdx + 600):
         i = i % numQ

@@ -39,7 +39,7 @@ def triplet_loss(q, labels, m):
 
 def main(_):
     qList, dbList = train_init.get_List(FLAGS.mat_path)
-    update_index_every = 100 / FLAGS.batch_size
+    update_index_every = 600 / FLAGS.batch_size
 
     if FLAGS.initH5:
         train_init.h5_initial(FLAGS.train_h5File)
