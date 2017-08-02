@@ -20,7 +20,7 @@ tf.app.flags.DEFINE_boolean('initH5', True, 'init hdf5 file or not')
 tf.app.flags.DEFINE_boolean('computeDist', False, 'compute distances of images or not')
 tf.app.flags.DEFINE_boolean('initIndex', False, 'init index of positives and negatives or not')
 tf.app.flags.DEFINE_boolean('loadImage', False, 'load dataset images or not')
-
+tf.app.flags.DEFINE_boolean('useRelu', False, 'use relu in loss function or not')
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -28,7 +28,10 @@ FLAGS = tf.app.flags.FLAGS
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
     positives, negatives = tf.split(L2_distance, [10, 20], axis = 1)
-    loss = tf.reduce_sum(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives)
+    if FLAGS.useRelu:
+        loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
+    else:
+        loss = tf.reduce_sum(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives)
     # loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
     return loss
 
