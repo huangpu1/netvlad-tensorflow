@@ -87,7 +87,7 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
         
     for i, ID in enumerate(qList):
         if i % 50 == 0:
-            print("updating progress: %s" % float(i) / len(qList))
+            print("updating progress: %s" % (float(i) / len(qList)))
         neg = fH5["%s/negatives" % ID]
         L2_dist = {}
         pneg = fH5["%s/potential_negatives" % ID]
