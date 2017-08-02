@@ -86,15 +86,14 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
 
         
     for i, ID in enumerate(qList):
-        if i % 50 == 0:
+        if i % 10 == 0:
             print("updating progress: %s" % (float(i) / len(qList)))
         neg = fH5["%s/negatives" % ID]
         L2_dist = {}
         pneg = fH5["%s/potential_negatives" % ID]
-        dist = np.linalg.norm(descriptorQ[i, :] - descriptorDB[pneg[:], :], axis = 1)
-        for k, j in enumerate(pneg):
-            L2_dist[str(j)] = dist[k]
-        L2Sorted = sorted(L2_dist.items(), key = lambda e:e[1])
+        for j in pneg:
+            L2_dist[str(j)] = np.linalg.norm(descriptorQ[i, :] - descriptorDB[j, :])
+        L2Sorted = sorted(L2_dist.items(), key = lambda e : e[1])
 
         for k in range(10):
             neg[10 + k] = neg[k]
@@ -112,7 +111,7 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
         idx = random.randint(0, numQ - 1)        
     else:
         idx = 0
-        
+
     for i in range(int(numBatch + 1)):
         z = i / numBatch * 100
         x = np.zeros((batch_size, 224, 224, 3))
