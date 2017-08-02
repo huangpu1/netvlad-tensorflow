@@ -1,5 +1,6 @@
 import os
 import math
+import random
 import numpy as np
 import scipy.io as sio
 import h5py
@@ -57,44 +58,40 @@ def index_initial(h5File, qList, dbList):
         if not ID in fH5:
             fH5.create_group(ID)
         if not "positives" in fH5[ID]:
-            fH5.create_dataset("%s/positives" % ID, (10, ), dtype = 'i')
+            fH5.create_dataset("%s/positives" % ID, (20, ), dtype = 'i')
         if not "negatives" in fH5[ID]:
             fH5.create_dataset("%s/negatives" % ID, (20, ), dtype = 'i')
         if not "potential_negatives" in fH5[ID]:
-            fH5.create_dataset("%s/potential_negatives" % ID, (300, ), dtype = 'i')
+            fH5.create_dataset("%s/potential_negatives" % ID, (1000, ), dtype = 'i')
 
         pos = fH5["%s/positives" % ID]
         neg = fH5["%s/negatives" % ID]
         pneg = fH5["%s/potential_negatives" % ID]
 
         posDic = {}
-        negDic = {}
+        negDic = []
 
         for j, dist in enumerate(distMat[i, :]):
             if dist >= 0 and dist <= 10:
                 posDic['%s' % j] = dist
-            elif dist > 25:
-                negDic['%s' % j] = dist
+            elif dist >= 25:
+                negDic.append(j)
 
         posSorted = sorted(posDic.items(), key = lambda e:e[1])
-        negSorted = sorted(negDic.items(), key = lambda e:e[1])
 
-        if len(posDic) >= 10:
-            for k in range(10):
+        if len(posDic) >= 20:
+            for k in range(20):
                 pos[k] = int(posSorted[k][0])
         else:
             for k in range(len(posSorted)):
                 pos[k] = int(posSorted[k][0])
-            for k in range(len(posSorted), 10):
+            for k in range(len(posSorted), 20):
                 pos[k] = pos[k - 1]
         
-        for k in range(300):
-            pneg[k] = int(negSorted[k][0])
+        pneg[:] = random.sample(negDic, 1000)
 
-        for k in range(10):
-            neg[k] = int(negSorted[k][0])
-        for k in range(10, 20):
-            neg[k] = neg[k - 10]
+        neg[0:10] = random.sample(pneg, 10)
+        neg[10:20] = neg[0:10]
 
     for i, ID in enumerate(dbList):
         if not ID in fH5:

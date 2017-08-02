@@ -91,8 +91,9 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
         neg = fH5["%s/negatives" % ID]
         L2_dist = {}
         pneg = fH5["%s/potential_negatives" % ID]
-        for j in pneg:
-            L2_dist[str(j)] = np.linalg.norm(descriptorQ[i, :] - descriptorDB[j, :])
+        dist = np.linalg.norm(descriptorQ[i, :] - descriptorDB[pneg[:], :], axis = 1)
+        for k, j in enumerate(pneg):
+            L2_dist[str(j)] = dist[k]
         L2Sorted = sorted(L2_dist.items(), key = lambda e:e[1])
 
         for k in range(10):
@@ -128,7 +129,7 @@ def next_batch(sess, model, batch_size, h5File, qList, dbList):
         output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
         for j in range(30):
             labels[:, :, j] = output[(batch_size * j) : (batch_size * j + batch_size), :]
-        print(x[0, 100, 100, :])
+
         yield x, labels, z
     fH5.close()
     return
