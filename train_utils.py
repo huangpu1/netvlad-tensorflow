@@ -106,7 +106,7 @@ def next_batch(sess, model, batch_size, h5File, qList, dbList):
     numQ = len(qList)
     numBatch = math.floor(numQ / batch_size)
     fH5 = h5py.File(h5File, 'r+')
-    idx = random.randint(0, numQ - 1)
+    idx = 0
     for i in range(int(numBatch + 1)):
         z = i / numBatch * 100
         x = np.zeros((batch_size, 224, 224, 3))
@@ -118,8 +118,6 @@ def next_batch(sess, model, batch_size, h5File, qList, dbList):
             x[t, :] = fH5["%s/imageData" % qList[idx]]
             pos = fH5["%s/positives" % qList[idx]]
             neg = fH5["%s/negatives" % qList[idx]]
-            print(pos[:])
-            print(neg[:])
 
             for j in range(10):
                 batch[(batch_size * j + t), :] = fH5["%s/imageData" % dbList[pos[j]]]
