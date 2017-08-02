@@ -5,8 +5,9 @@ import train_utils
 import train_init
 import os
 
-update_index_every = 150
-batch_size = 4
+
+batch_size = 8
+update_index_every = 600 / batch_size
 numEpoch = 30
 checkpoint_dir = "checkpoint"
 data_dir = "tokyoTM/images"

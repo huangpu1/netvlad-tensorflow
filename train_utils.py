@@ -63,7 +63,7 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
     numBatchQ = int(math.floor(len(qList) / batch_size))
     for i in range(numBatchQ):
         if i % 10 == 0:
-            print("query image progress: %s\n" % (float(i) / numBatchQ))
+            print("query image forward progress: %s\n" % (float(i) / numBatchQ))
         for j in range(batch_size):
             ID = qList[i * batch_size + j]
             batch[j, :] = fH5["%s/imageData" % ID]
@@ -75,7 +75,7 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
     numBatchDB = int(math.floor(len(dbList) / batch_size))
     for i in range(numBatchDB):
         if i % 10 == 0:
-            print("database image progress: %s\n" % (float(i) / numBatchQ))
+            print("database image forward progress: %s\n" % (float(i) / numBatchDB))
         for j in range(batch_size):
             ID = dbList[i * batch_size + j]
             batch[j, :] = fH5["%s/imageData" % ID]
@@ -86,6 +86,8 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
 
         
     for i, ID in enumerate(qList):
+        if i % 50 == 0:
+            print("updating progress: %s" % float(i) / len(qList))
         neg = fH5["%s/negatives" % ID]
         L2_dist = {}
         pneg = fH5["%s/potential_negatives" % ID]
