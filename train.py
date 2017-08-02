@@ -6,7 +6,7 @@ import train_init
 import os
 
 
-batch_size = 6
+batch_size = 4
 update_index_every = 600 / batch_size
 numEpoch = 30
 checkpoint_dir = "checkpoint"
