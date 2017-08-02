@@ -5,21 +5,21 @@ import train_utils
 import train_init
 import os
 
-tf.app.flags.DEFINE_string('checkpoint_dir', 'checkpoint')
-tf.app.flags.DEFINE_string('data_dir', 'tokyoTM/images')
-tf.app.flags.DEFINE_string('train_h5File', 'index/traindata.hdf5')
-tf.app.flags.DEFINE_string('mat_path', 'tokyoTM/tokyoTM_train.mat')
+tf.app.flags.DEFINE_string('checkpoint_dir', 'checkpoint', 'directory to save trained models')
+tf.app.flags.DEFINE_string('data_dir', 'tokyoTM/images', 'directory of image data')
+tf.app.flags.DEFINE_string('train_h5File', 'index/traindata.hdf5', 'training dataset hdf5 file')
+tf.app.flags.DEFINE_string('mat_path', 'tokyoTM/tokyoTM_train.mat', 'image dataset .mat')
 
-tf.app.flags.DEFINE_integer('batch_size', 4)
-tf.app.flags.DEFINE_integer('numEpoch', 300)
-tf.app.flags.DEFINE_integer('lr', 0.001)
-tf.app.flags.DEFINE_integer('print_every', 5)
-tf.app.flags.DEFINE_integer('save_every', 5)
+tf.app.flags.DEFINE_integer('batch_size', 4, 'num of triplets in a batch')
+tf.app.flags.DEFINE_integer('numEpoch', 300, 'num of epochs to train')
+tf.app.flags.DEFINE_integer('lr', 0.001, 'initial learning rate')
+tf.app.flags.DEFINE_integer('print_every', 5, 'print every ... batch')
+tf.app.flags.DEFINE_integer('save_every', 5, 'save model every ... epochs')
 
-tf.app.flags.DEFINE_boolean('initH5', True)
-tf.app.flags.DEFINE_boolean('computeDist', False)
-tf.app.flags.DEFINE_boolean('initIndex', False)
-tf.app.flags.DEFINE_boolean('loadImage', False)
+tf.app.flags.DEFINE_boolean('initH5', True, 'init hdf5 file or not')
+tf.app.flags.DEFINE_boolean('computeDist', False, 'compute distances of images or not')
+tf.app.flags.DEFINE_boolean('initIndex', False, 'init index of positives and negatives or not')
+tf.app.flags.DEFINE_boolean('loadImage', False, 'load dataset images or not')
 
 
 FLAGS = tf.app.flags.FLAGS
