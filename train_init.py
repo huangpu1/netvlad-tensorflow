@@ -34,7 +34,7 @@ def compute_dist(mat_path, h5_file):
         distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc, axis = 1)
     fH5.close()
 
-    return qList, dbList
+    return
 
 
 def h5_initial(train_h5File):

@@ -118,6 +118,8 @@ def next_batch(sess, model, batch_size, h5File, qList, dbList):
             x[t, :] = fH5["%s/imageData" % qList[idx]]
             pos = fH5["%s/positives" % qList[idx]]
             neg = fH5["%s/negatives" % qList[idx]]
+            print(pos[:])
+            print(neg[:])
 
             for j in range(10):
                 batch[(batch_size * j + t), :] = fH5["%s/imageData" % dbList[pos[j]]]

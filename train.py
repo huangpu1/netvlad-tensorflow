@@ -5,20 +5,25 @@ import train_utils
 import train_init
 import os
 
+tf.app.flags.DEFINE_string('checkpoint_dir', 'checkpoint')
+tf.app.flags.DEFINE_string('data_dir', 'tokyoTM/images')
+tf.app.flags.DEFINE_string('train_h5File', 'index/traindata.hdf5')
+tf.app.flags.DEFINE_string('mat_path', 'tokyoTM/tokyoTM_train.mat')
 
-batch_size = 4
-update_index_every = 600 / batch_size
-numEpoch = 30
-checkpoint_dir = "checkpoint"
-data_dir = "tokyoTM/images"
-train_h5File = "index/traindata.hdf5"
-mat_path = "tokyoTM/tokyoTM_train.mat"
+tf.app.flags.DEFINE_integer('batch_size', 4)
+tf.app.flags.DEFINE_integer('numEpoch', 300)
+tf.app.flags.DEFINE_integer('lr', 0.001)
+tf.app.flags.DEFINE_integer('print_every', 5)
+tf.app.flags.DEFINE_integer('save_every', 5)
 
-qList, dbList = train_init.get_List(mat_path)
-train_init.h5_initial(train_h5File)
-#qList, dbList = train_init.compute_dist(mat_path, train_h5File)
-#train_init.index_initial(train_h5File, qList, dbList)
-train_init.multipro_load_image(data_dir, train_h5File, qList, dbList)
+tf.app.flags.DEFINE_boolean('initH5', True)
+tf.app.flags.DEFINE_boolean('computeDist', False)
+tf.app.flags.DEFINE_boolean('initIndex', False)
+tf.app.flags.DEFINE_boolean('loadImage', False)
+
+
+FLAGS = tf.app.flags.FLAGS
+
 
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
@@ -26,41 +31,53 @@ def triplet_loss(q, labels, m):
     loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
     return loss
 
-with tf.device('/gpu:0'):
-    sess = tf.Session()
+def main(_):
+    qList, dbList = train_init.get_List(FLAGS.mat_path)
+    update_index_every = 600 / FLAGS.batch_size
 
-    query_image = tf.placeholder(tf.float32,[None, 224, 224, 3], name = 'query_image')
-    labels = tf.placeholder(tf.float32, [None, 32768, 30])
-    train_mode = tf.placeholder(tf.bool, name = 'train_mode')
+    if FLAGS.initH5:
+        train_init.h5_initial(FLAGS.train_h5File)
+    if FLAGS.computeDist:
+        train_init.compute_dist(FLAGS.mat_path, FLAGS.train_h5File)
+    if FLAGS.initIndex:
+        train_init.index_initial(FLAGS.train_h5File, qList, dbList)
+    if FLAGS.loadImage:
+        train_init.multipro_load_image(FLAGS.data_dir, FLAGS.train_h5File, qList, dbList)
 
-    model = netvlad.Netvlad('./vgg16.npy')
-    model.build(query_image, train_mode)
+    with tf.device('/gpu:0'):
+        sess = tf.Session()
 
-    print("number of total parameters in the model is %d\n" % model.get_var_count())
+        query_image = tf.placeholder(tf.float32,[None, 224, 224, 3], name = 'query_image')
+        labels = tf.placeholder(tf.float32, [None, 32768, 30])
+        train_mode = tf.placeholder(tf.bool, name = 'train_mode')
 
-    sess.run(tf.global_variables_initializer())
+        model = netvlad.Netvlad('./vgg16.npy')
+        model.build(query_image, train_mode)
 
-    loss = triplet_loss(model.vlad_output, labels, 0.1)
-    lr = 0.001
-    train = tf.train.GradientDescentOptimizer(lr).minimize(loss)
-    train_loss = 0
+        print("number of total parameters in the model is %d\n" % model.get_var_count())
+
+        sess.run(tf.global_variables_initializer())
+
+        loss = triplet_loss(model.vlad_output, labels, 0.1)
+        train = tf.train.GradientDescentOptimizer(FLAGS.lr).minimize(loss)
+        train_loss = 0
     
-    
-
-    count = 0
-    print("training begins!\n")
-    for i in range(numEpoch):
+        count = 0
+        print("training begins!\n")
+        for i in range(FLAGS.numEpoch):
         
-        for x, y, z in train_utils.next_batch(sess, model, batch_size, train_h5File, qList, dbList):
-            if count >= update_index_every:
-                count = 0
-                train_utils.index_update(sess, model, batch_size * 30, train_h5File, qList, dbList)
-            count = count + 1
-            _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
-            if count % 5 == 0:
-                print("Epoch: %d    progress: %.4f%%  training_loss = %.6f\n" % (i, z, train_loss))
-        if (i + 1) % 5 == 0:
-            model.save_npy(sess, "%s/netvlad_epoch_%d_loss_%.6f" % (checkpoint_dir, i, train_loss))
-            lr = lr / 2
-            update_index_every *= 2
+            for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, qList, dbList):
+                if count >= update_index_every:
+                    count = 0
+                    train_utils.index_update(sess, model, FLAGS.batch_size * 30, FLAGS.train_h5File, qList, dbList)
+                count = count + 1
+                _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
+                if count % FLAGS.print_every == 0:
+                    print("Epoch: %d    progress: %.4f%%  training_loss = %.6f\n" % (i, z, train_loss))
+            if (i + 1) % FLAGS.save_every == 0:
+                model.save_npy(sess, "%s/netvlad_epoch_%d_loss_%.6f" % (FLAGS.checkpoint_dir, i, train_loss))
+                FLAGS.lr /= 2
+                update_index_every *= 2
 
+if __name__ == '__main__':
+    tf.app.run()
