@@ -15,7 +15,8 @@ tf.app.flags.DEFINE_integer('numEpoch', 300, 'num of epochs to train')
 tf.app.flags.DEFINE_integer('lr', 0.001, 'initial learning rate')
 tf.app.flags.DEFINE_integer('print_every', 5, 'print every ... batch')
 tf.app.flags.DEFINE_integer('save_every', 5, 'save model every ... epochs')
-tf.app.flags.DEFINE_integer('startIdx', '0', 'start fetching batch from idx...')
+
+tf.app.flags.DEFINE_boolean('randomStartIdx', True, 'start fetching batch from idx...')
 
 tf.app.flags.DEFINE_boolean('initH5', True, 'init hdf5 file or not')
 tf.app.flags.DEFINE_boolean('computeDist', False, 'compute distances of images or not')
@@ -71,7 +72,7 @@ def main(_):
         print("training begins!\n")
         for i in range(FLAGS.numEpoch):
         
-            for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.startIdx, qList, dbList):
+            for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.randomStartIdx, qList, dbList):
                 if count >= update_index_every:
                     count = 0
                     train_utils.index_update(sess, model, FLAGS.batch_size * 40, FLAGS.train_h5File, qList, dbList)
