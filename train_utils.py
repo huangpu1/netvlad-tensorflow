@@ -128,7 +128,7 @@ def next_batch(sess, model, batch_size, h5File, qList, dbList):
         output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
         for j in range(30):
             labels[:, :, j] = output[(batch_size * j) : (batch_size * j + batch_size), :]
-
+        print(x[0, 100, 100, :])
         yield x, labels, z
     fH5.close()
     return
