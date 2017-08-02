@@ -52,7 +52,7 @@ def index_initial(h5File, qList, dbList):
     distMat = fH5['distance_matrix']
 
     for i in range(len(qList)):
-        if i % 10 == 0:
+        if i % 50 == 0:
             print("computing idx of image %s" % i)
         ID = qList[i]
         if not ID in fH5:

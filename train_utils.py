@@ -93,7 +93,7 @@ def index_update(sess, model, batch_size, h5File, qList, dbList, currentIdx):
     for i in range(currentIdx, currentIdx + 600):
         i = i % numQ
         ID = qList[i]
-        if i % 10 == 0:
+        if i % 20 == 0:
             print("updating progress: %s" % (float(i - currentIdx) / 600))
 
         neg = fH5["%s/negatives" % ID]
