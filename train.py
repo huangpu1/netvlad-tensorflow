@@ -11,7 +11,7 @@ tf.app.flags.DEFINE_string('train_h5File', 'index/traindata.hdf5', 'training dat
 tf.app.flags.DEFINE_string('mat_path', 'tokyoTM/tokyoTM_train.mat', 'image dataset .mat')
 
 tf.app.flags.DEFINE_integer('batch_size', 4, 'num of triplets in a batch')
-tf.app.flags.DEFINE_integer('numEpoch', 300, 'num of epochs to train')
+tf.app.flags.DEFINE_integer('numEpoch', 30, 'num of epochs to train')
 tf.app.flags.DEFINE_integer('lr', 0.001, 'initial learning rate')
 tf.app.flags.DEFINE_integer('print_every', 5, 'print every ... batch')
 tf.app.flags.DEFINE_integer('save_every', 5, 'save model every ... epochs')
@@ -72,11 +72,12 @@ def main(_):
         print("training begins!\n")
         for i in range(FLAGS.numEpoch):
         
-            for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.randomStartIdx, qList, dbList):
+            for x, y, z, currentIdx in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.randomStartIdx, qList, dbList):
+                count = count + 1
                 if count >= update_index_every:
                     count = 0
-                    train_utils.index_update(sess, model, FLAGS.batch_size * 40, FLAGS.train_h5File, qList, dbList)
-                count = count + 1
+                    train_utils.index_update(sess, model, FLAGS.batch_size * 20, FLAGS.train_h5File, qList, dbList, currentIdx)
+                
                 _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
                 if count % FLAGS.print_every == 0:
                     print("Epoch: %d    progress: %.4f%%  training_loss = %.6f\n" % (i, z, train_loss))
