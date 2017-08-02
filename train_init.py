@@ -70,7 +70,7 @@ def index_initial(h5File, qList, dbList):
 
         pos[:] = np.argsort(distMat[i, :])[:20]
 
-        indices = np.where(distMat[i, :] >= 25)
+        indices = np.where(distMat[i, :] >= 25)[0]
         pneg[:] = random.sample(indices, 1000)
         neg[:] = random.sample(pneg, 20)
 
