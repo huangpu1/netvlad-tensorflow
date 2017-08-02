@@ -103,11 +103,11 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
     print("Done!\n")
     return
 
-def next_batch(sess, model, batch_size, h5File, qList, dbList):
+def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
     numQ = len(qList)
     numBatch = math.floor(numQ / batch_size)
     fH5 = h5py.File(h5File, 'r+')
-    idx = 0
+    idx = idxS
     for i in range(int(numBatch + 1)):
         z = i / numBatch * 100
         x = np.zeros((batch_size, 224, 224, 3))
