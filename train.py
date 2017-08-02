@@ -28,7 +28,7 @@ FLAGS = tf.app.flags.FLAGS
 
 def triplet_loss(q, labels, m):
     L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
-    positives, negatives = tf.split(L2_distance, [10, 20], axis = 1)
+    positives, negatives = tf.split(L2_distance, [20, 20], axis = 1)
     if FLAGS.useRelu:
         loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
     else:
@@ -53,7 +53,7 @@ def main(_):
         sess = tf.Session()
 
         query_image = tf.placeholder(tf.float32,[None, 224, 224, 3], name = 'query_image')
-        labels = tf.placeholder(tf.float32, [None, 32768, 30])
+        labels = tf.placeholder(tf.float32, [None, 32768, 40])
         train_mode = tf.placeholder(tf.bool, name = 'train_mode')
 
         model = netvlad.Netvlad('./vgg16.npy')
@@ -74,7 +74,7 @@ def main(_):
             for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.startIdx, qList, dbList):
                 if count >= update_index_every:
                     count = 0
-                    train_utils.index_update(sess, model, FLAGS.batch_size * 30, FLAGS.train_h5File, qList, dbList)
+                    train_utils.index_update(sess, model, FLAGS.batch_size * 40, FLAGS.train_h5File, qList, dbList)
                 count = count + 1
                 _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
                 if count % FLAGS.print_every == 0:
