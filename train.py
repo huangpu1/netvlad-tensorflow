@@ -72,11 +72,11 @@ def main(_):
         print("training begins!\n")
         for i in range(FLAGS.numEpoch):
         
-            for x, y, z, currentIdx in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.randomStartIdx, qList, dbList):
+            for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.randomStartIdx, qList, dbList):
                 count = count + 1
                 if count >= update_index_every:
                     count = 0
-                    train_utils.index_update(sess, model, FLAGS.batch_size * 20, FLAGS.train_h5File, qList, dbList, currentIdx)
+                    train_utils.index_update(sess, model, FLAGS.batch_size * 30, FLAGS.train_h5File, qList, dbList)
                 
                 _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
                 if count % FLAGS.print_every == 0:

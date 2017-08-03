@@ -48,7 +48,7 @@ def load_image2(path, height=None, width=None):
         nx = img.shape[1]
     return skimage.transform.resize(img, (ny, nx))
 
-def index_update(sess, model, batch_size, h5File, qList, dbList, currentIdx):
+def index_update(sess, model, batch_size, h5File, qList, dbList):
     print("Updating positives and negatives...\n")
     fH5 = h5py.File(h5File, 'r+')
     numQ = len(qList)
@@ -90,11 +90,10 @@ def index_update(sess, model, batch_size, h5File, qList, dbList, currentIdx):
     C = np.linalg.norm(descriptorDB, axis = 1) ** 2
     L2_distance = np.sqrt(B + C - 2 * A)
 
-    for i in range(currentIdx, currentIdx + 600):
-        i = i % numQ
+    for i in range(numQ):
         ID = qList[i]
         if i % 20 == 0:
-            print("updating progress: %s" % (float(i - currentIdx) / 600))
+            print("updating progress: %s" % (float(i) / numQ))
 
         neg = fH5["%s/negatives" % ID]
         pneg = fH5["%s/potential_negatives" % ID]
@@ -141,6 +140,6 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
         for j in range(40):
             labels[:, :, j] = output[(batch_size * j) : (batch_size * j + batch_size), :]
 
-        yield x, labels, z, idx
+        yield x, labels, z
     fH5.close()
     return
