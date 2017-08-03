@@ -110,7 +110,6 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
 def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
     numQ = len(qList)
     numBatch = math.floor(numQ / batch_size)
-    fH5 = h5py.File(h5File, 'r+')
 
     if idxS:
         idx = random.randint(0, numQ - 1)        
@@ -118,6 +117,7 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
         idx = 0
 
     for i in range(int(numBatch + 1)):
+        fH5 = h5py.File(h5File, 'r+')
         z = i / numBatch * 100
         x = np.zeros((batch_size, 224, 224, 3))
         labels = np.zeros((batch_size, 32768, 40))
@@ -139,7 +139,8 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
         output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
         for j in range(40):
             labels[:, :, j] = output[(batch_size * j) : (batch_size * j + batch_size), :]
+        fH5.close()
 
         yield x, labels, z
-    fH5.close()
+    
     return
