@@ -39,7 +39,7 @@ def triplet_loss(q, labels, m):
 
 def main(_):
     qList, dbList = train_init.get_List(FLAGS.mat_path)
-    update_index_every = 600 / FLAGS.batch_size
+    update_index_every = 1200 / FLAGS.batch_size
 
     if FLAGS.initH5:
         train_init.h5_initial(FLAGS.train_h5File)
@@ -70,7 +70,7 @@ def main(_):
     
         count = 0
         print("training begins!\n")
-        for i in range(FLAGS.numEpoch):
+        for i in range(5, FLAGS.numEpoch):
         
             for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.randomStartIdx, qList, dbList):
                 count = count + 1
