@@ -57,7 +57,7 @@ def main(_):
         labels = tf.placeholder(tf.float32, [None, 32768, 40])
         train_mode = tf.placeholder(tf.bool, name = 'train_mode')
 
-        model = netvlad.Netvlad('checkpoint/netvlad_epoch_4_loss_1.843014.npy')
+        model = netvlad.Netvlad('checkpoint/netvlad_epoch_14_loss_7.706313.npy')
         model.build(query_image, train_mode)
 
         print("number of total parameters in the model is %d\n" % model.get_var_count())
