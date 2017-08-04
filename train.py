@@ -62,10 +62,11 @@ def main(_):
 
         print("number of total parameters in the model is %d\n" % model.get_var_count())
 
-        sess.run(tf.global_variables_initializer())
+        
 
         loss = triplet_loss(model.vlad_output, labels, 0.1)
         train = tf.train.RMSPropOptimizer(FLAGS.lr).minimize(loss)
+        sess.run(tf.global_variables_initializer())
         train_loss = 0
     
         count = 0
