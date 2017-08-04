@@ -12,7 +12,7 @@ tf.app.flags.DEFINE_string('mat_path', 'tokyoTM/tokyoTM_train.mat', 'image datas
 
 tf.app.flags.DEFINE_integer('batch_size', 4, 'num of triplets in a batch')
 tf.app.flags.DEFINE_integer('numEpoch', 30, 'num of epochs to train')
-tf.app.flags.DEFINE_integer('lr', 0.001, 'initial learning rate')
+tf.app.flags.DEFINE_integer('lr', 0.0001, 'initial learning rate')
 tf.app.flags.DEFINE_integer('print_every', 5, 'print every ... batch')
 tf.app.flags.DEFINE_integer('save_every', 5, 'save model every ... epochs')
 
@@ -39,7 +39,7 @@ def triplet_loss(q, labels, m):
 
 def main(_):
     qList, dbList = train_init.get_List(FLAGS.mat_path)
-    update_index_every = 1200 / FLAGS.batch_size
+    update_index_every = 4800 / FLAGS.batch_size
 
     if FLAGS.initH5:
         train_init.h5_initial(FLAGS.train_h5File)
@@ -65,12 +65,12 @@ def main(_):
         sess.run(tf.global_variables_initializer())
 
         loss = triplet_loss(model.vlad_output, labels, 0.1)
-        train = tf.train.GradientDescentOptimizer(FLAGS.lr).minimize(loss)
+        train = tf.train.RMSPropOptimizer(FLAGS.lr).minimize(loss)
         train_loss = 0
     
         count = 0
         print("training begins!\n")
-        for i in range(5, FLAGS.numEpoch):
+        for i in range(15, FLAGS.numEpoch):
         
             for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.randomStartIdx, qList, dbList):
                 count = count + 1
@@ -83,7 +83,6 @@ def main(_):
                     print("Epoch: %d    progress: %.4f%%  training_loss = %.6f\n" % (i, z, train_loss))
             if (i + 1) % FLAGS.save_every == 0:
                 model.save_npy(sess, "%s/netvlad_epoch_%d_loss_%.6f" % (FLAGS.checkpoint_dir, i, train_loss))
-                FLAGS.lr /= 2
                 update_index_every *= 2
 
 if __name__ == '__main__':
