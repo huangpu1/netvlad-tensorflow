@@ -101,7 +101,7 @@ def evaluate(sess, model, batch_size, h5File, qList, dbList, numRecall):
             print("current accuracy: %.4f   %.4f    %.4f    %.4f   evaluation progress: %.4f" % (accuracy1, accuracy2, accuracy3, accuracy4, (float(i) / numQ)))
         indices1 = np.argsort(L2_distance[i, :])[:1]
         indices2 = np.argsort(L2_distance[i, :])[:5]
-        print(indices2)
+        print(L2_distance[i, indices2])
         indices3 = np.argsort(L2_distance[i, :])[:10]
         indices4 = np.argsort(L2_distance[i, :])[:20]
         for j in indices1:
