@@ -35,6 +35,6 @@ def main(_):
         C = np.sum(descriptor ** 2, axis = 1)
         print(B + C - 2 * A)
         L2_distance = np.sqrt(B + C - 2 * A)
-        print(L2_distance[0, :])
+        print(L2_distance)
 if __name__ == '__main__':
     tf.app.run()
