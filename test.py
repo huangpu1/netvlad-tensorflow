@@ -33,6 +33,7 @@ def main(_):
         A = np.dot(descriptor, descriptor.transpose())
         B = np.sum(descriptor ** 2, axis = 1, keepdims = True)
         C = np.sum(descriptor ** 2, axis = 1)
+        print(B + C - 2 * A)
         L2_distance = np.sqrt(B + C - 2 * A)
         print(L2_distance[0, :])
 if __name__ == '__main__':
