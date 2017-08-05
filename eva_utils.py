@@ -95,7 +95,7 @@ def evaluate(sess, model, batch_size, h5File, qList, dbList, numRecall):
             print("current accuracy: %.4f%%   evaluation progress: %.4f" % (accuracy, (float(i) / numQ)))
         indices = np.argsort(L2_distance[i, :])[:numRecall]
         for j in indices:
-            if distMat[i, j] <= 25:
+            if distMat[i, j] == 0:
                 count += 1
                 break
         accuracy = float(count) / (i + 1)
