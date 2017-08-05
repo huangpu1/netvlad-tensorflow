@@ -86,9 +86,11 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
 
     # compute mutual L2 distance between query and database
     A = np.dot(descriptorQ, descriptorDB.transpose())
-    B = np.linalg.norm(descriptorQ, axis = 1, keepdims = True) ** 2
-    C = np.linalg.norm(descriptorDB, axis = 1) ** 2
-    L2_distance = np.sqrt(B + C - 2 * A)
+    B = np.sum(descriptorQ ** 2, axis = 1, keepdims = True)
+    C = np.sum(descriptorDB ** 2, axis = 1)
+    D = B + C - 2 * A
+    D[D < 0] = 0
+    L2_distance = np.sqrt(D)
 
     for i in range(numQ):
         ID = qList[i]
