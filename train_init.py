@@ -12,7 +12,7 @@ import train_utils
 def get_List(mat_path):
     boxes = sio.loadmat(mat_path)["dbStruct"]
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
-    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0] and (not x in boxes["qImageFns"][0, 0])]
+    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0] if not (x in boxes["qImageFns"][0, 0])]
 
     return qList, dbList
 
@@ -20,7 +20,7 @@ def compute_dist(mat_path, h5_file):
     boxes = sio.loadmat(mat_path)["dbStruct"]
 
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
-    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0] and (not x in boxes["qImageFns"][0, 0])]
+    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0] if (not x in boxes["qImageFns"][0, 0])]
 
     qLoc = boxes["utmQ"][0, 0].transpose()
     dbLoc = boxes["utmDb"][0, 0].transpose()
