@@ -88,17 +88,41 @@ def evaluate(sess, model, batch_size, h5File, qList, dbList, numRecall):
     C = np.linalg.norm(descriptorDB, axis = 1) ** 2
     L2_distance = np.sqrt(B + C - 2 * A)
 
-    count = 0
-    accuracy = 0
+    count1 = 0
+    count2 = 0
+    count3 = 0
+    count4 = 0
+    accuracy1 = 0
+    accuracy2 = 0
+    accuracy3 = 0
+    accuracy4 = 0
     for i in range(numQ):
         if i % 20 == 0:
-            print("current accuracy: %.4f%%   evaluation progress: %.4f" % (accuracy, (float(i) / numQ)))
-        indices = np.argsort(L2_distance[i, :])[:numRecall]
-        for j in indices:
+            print("current accuracy: %.4f   %.4f    %.4f    %.4f   evaluation progress: %.4f" % (accuracy1, accuracy2, accuracy3, accuracy4, (float(i) / numQ)))
+        indices1 = np.argsort(L2_distance[i, :])[:1]
+        indices2 = np.argsort(L2_distance[i, :])[:5]
+        indices3 = np.argsort(L2_distance[i, :])[:10]
+        indices4 = np.argsort(L2_distance[i, :])[:20]
+        for j in indices1:
             if distMat[i, j] == 0:
-                count += 1
+                count1 += 1
                 break
-        accuracy = float(count) / (i + 1)
+        for j in indices2:
+            if distMat[i, j] == 0:
+                count2 += 1
+                break
+        for j in indices3:
+            if distMat[i, j] == 0:
+                count3 += 1
+                break
+        for j in indices4:
+            if distMat[i, j] == 0:
+                count4 += 1
+                break
+        accuracy1 = float(count1) / (i + 1)
+        accuracy2 = float(count2) / (i + 1)
+        accuracy3 = float(count3) / (i + 1)
+        accuracy4 = float(count4) / (i + 1)
     fH5.close()
     print("Done!\n")
     return
