@@ -123,7 +123,7 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
         z = i / numBatch * 100
         x = np.zeros((batch_size, 224, 224, 3))
         labels = np.zeros((batch_size, 32768, 40))
-        batch = np.zeros((batch_size * 40, 224, 224, 3))
+        batch = np.zeros((batch_size * 60, 224, 224, 3))
         for t in range(batch_size):
             idx = idx % numQ
             
@@ -132,14 +132,14 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
             pos = fH5["%s/positives" % qList[idx]]
             neg = fH5["%s/negatives" % qList[idx]]
 
-            for j in range(20):
+            for j in range(40):
                 batch[(batch_size * j + t), :] = fH5["%s/imageData" % dbList[pos[j]]]
             for k in range(20):
                 batch[(batch_size * k + 20 * batch_size + t), :] = fH5["%s/imageData" % dbList[neg[k]]]
             idx += 1
 
         output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
-        for j in range(40):
+        for j in range(60):
             labels[:, :, j] = output[(batch_size * j) : (batch_size * j + batch_size), :]
         fH5.close()
 

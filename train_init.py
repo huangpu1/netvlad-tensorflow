@@ -12,7 +12,7 @@ import train_utils
 def get_List(mat_path):
     boxes = sio.loadmat(mat_path)["dbStruct"]
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
-    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0]]
+    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0] and (not x in boxes["qImageFns"][0, 0])]
 
     return qList, dbList
 
@@ -20,7 +20,7 @@ def compute_dist(mat_path, h5_file):
     boxes = sio.loadmat(mat_path)["dbStruct"]
 
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
-    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0]]
+    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0] and (not x in boxes["qImageFns"][0, 0])]
 
     qLoc = boxes["utmQ"][0, 0].transpose()
     dbLoc = boxes["utmDb"][0, 0].transpose()
@@ -58,7 +58,7 @@ def index_initial(h5File, qList, dbList):
         if not ID in fH5:
             fH5.create_group(ID)
         if not "positives" in fH5[ID]:
-            fH5.create_dataset("%s/positives" % ID, (20, ), dtype = 'i')
+            fH5.create_dataset("%s/positives" % ID, (40, ), dtype = 'i')
         if not "negatives" in fH5[ID]:
             fH5.create_dataset("%s/negatives" % ID, (20, ), dtype = 'i')
         if not "potential_negatives" in fH5[ID]:
@@ -68,7 +68,7 @@ def index_initial(h5File, qList, dbList):
         neg = fH5["%s/negatives" % ID]
         pneg = fH5["%s/potential_negatives" % ID]
 
-        pos[:] = np.argsort(distMat[i, :])[:20]
+        pos[:] = np.argsort(distMat[i, :])[:40]
 
         indices = np.where(distMat[i, :] >= 25)[0]
         pneg[:] = random.sample(indices, 1000)
