@@ -34,6 +34,6 @@ def main(_):
         B = np.linalg.norm(descriptor, axis = 1, keepdims = True) ** 2
         C = np.linalg.norm(descriptor, axis = 1) ** 2
         L2_distance = np.sqrt(B + C - 2 * A)
-        print(L2_distance)
+        print(L2_distance[0, :])
 if __name__ == '__main__':
     tf.app.run()
