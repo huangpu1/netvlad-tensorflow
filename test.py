@@ -31,8 +31,8 @@ def main(_):
             batch[i - 1, :, :, :] = eva_utils.load_image(("test/%s.JPG" % (i)))
         descriptor = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
         A = np.dot(descriptor, descriptor.transpose())
-        B = np.linalg.norm(descriptor, axis = 1, keepdims = True) ** 2
-        C = np.linalg.norm(descriptor, axis = 1) ** 2
+        B = np.sum(descriptor ** 2, axis = 1, keepdims = True)
+        C = np.sum(descriptor ** 2, axis = 1)
         L2_distance = np.sqrt(B + C - 2 * A)
         print(L2_distance[0, :])
 if __name__ == '__main__':
