@@ -103,7 +103,6 @@ def evaluate(sess, model, batch_size, h5File, qList, dbList, numRecall):
             print("current accuracy: %.4f   %.4f    %.4f    %.4f   evaluation progress: %.4f" % (accuracy1, accuracy2, accuracy3, accuracy4, (float(i) / numQ)))
         indices1 = np.argsort(L2_distance[i, :])[:1]
         indices2 = np.argsort(L2_distance[i, :])[:5]
-        print(indices2)
         indices3 = np.argsort(L2_distance[i, :])[:10]
         indices4 = np.argsort(L2_distance[i, :])[:20]
         for j in indices1:
@@ -126,6 +125,21 @@ def evaluate(sess, model, batch_size, h5File, qList, dbList, numRecall):
         accuracy2 = float(count2) / (i + 1)
         accuracy3 = float(count3) / (i + 1)
         accuracy4 = float(count4) / (i + 1)
+    fH5.close()
+    print("Done!\n")
+    return
+
+def debug(h5File, qList, dbList):
+    fH5 = h5py.File(h5File, 'r+')
+    distMat = fH5['distance_matrix']
+    numQ = len(qList)
+    numDB = len(dbList)
+
+    indices = list(np.where(distMat[1, :] == 0)[0])
+    for j in indices:
+        img1 = fH5["%s/imageData" % qList[1]]
+        img2 = fH5["%s/imageData" % dbList[j]]
+        print(np.sum(img1[:] - img2[:]))
     fH5.close()
     print("Done!\n")
     return
