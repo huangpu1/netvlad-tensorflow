@@ -14,7 +14,7 @@ tf.app.flags.DEFINE_integer('batch_size', 4, 'num of triplets in a batch')
 tf.app.flags.DEFINE_integer('numEpoch', 30, 'num of epochs to train')
 tf.app.flags.DEFINE_integer('lr', 0.0001, 'initial learning rate')
 tf.app.flags.DEFINE_integer('print_every', 5, 'print every ... batch')
-tf.app.flags.DEFINE_integer('save_every', 5, 'save model every ... epochs')
+tf.app.flags.DEFINE_integer('save_every', 2, 'save model every ... epochs')
 
 tf.app.flags.DEFINE_boolean('randomStartIdx', True, 'start fetching batch from idx...')
 
@@ -39,7 +39,7 @@ def triplet_loss(q, labels, m):
 
 def main(_):
     qList, dbList = train_init.get_List(FLAGS.mat_path)
-    update_index_every = 4800 / FLAGS.batch_size
+    update_index_every = 1000 / FLAGS.batch_size
 
     if FLAGS.initH5:
         train_init.h5_initial(FLAGS.train_h5File)
@@ -57,7 +57,7 @@ def main(_):
         labels = tf.placeholder(tf.float32, [None, 32768, 40])
         train_mode = tf.placeholder(tf.bool, name = 'train_mode')
 
-        model = netvlad.Netvlad('checkpoint/netvlad_epoch_14_loss_7.706313.npy')
+        model = netvlad.Netvlad('vgg16.npy')
         model.build(query_image, train_mode)
 
         print("number of total parameters in the model is %d\n" % model.get_var_count())
@@ -71,7 +71,7 @@ def main(_):
     
         count = 0
         print("training begins!\n")
-        for i in range(15, FLAGS.numEpoch):
+        for i in range(FLAGS.numEpoch):
         
             for x, y, z in train_utils.next_batch(sess, model, FLAGS.batch_size, FLAGS.train_h5File, FLAGS.randomStartIdx, qList, dbList):
                 count = count + 1

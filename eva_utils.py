@@ -140,6 +140,7 @@ def debug(h5File, qList, dbList):
         img1 = fH5["%s/imageData" % qList[1]]
         img2 = fH5["%s/imageData" % dbList[j]]
         print(np.sum(img1[:] - img2[:]))
+        print(qList[1] == dbList[j])
     fH5.close()
     print("Done!\n")
     return
