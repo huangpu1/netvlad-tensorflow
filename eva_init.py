@@ -55,6 +55,8 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
             if i % 100 == 0:
                 print("image %s loaded" % i)
             ID = idList[i]
+            if not ID in fH5:
+                fH5.create_group(ID)
             if not "imageData" in fH5[ID]:
                 fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
             fH5["%s/imageData" % ID][:] = eva_utils.load_image(("%s/%s" % (data_dir, idList[i])))
