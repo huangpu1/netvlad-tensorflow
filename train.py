@@ -54,7 +54,7 @@ def main(_):
         sess = tf.Session()
 
         query_image = tf.placeholder(tf.float32,[None, 224, 224, 3], name = 'query_image')
-        labels = tf.placeholder(tf.float32, [None, 32768, 40])
+        labels = tf.placeholder(tf.float32, [None, 32768, 60])
         train_mode = tf.placeholder(tf.bool, name = 'train_mode')
 
         model = netvlad.Netvlad('vgg16.npy')
