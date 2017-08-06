@@ -12,7 +12,7 @@ import train_utils
 def get_List(mat_path):
     boxes = sio.loadmat(mat_path)["dbStruct"]
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
-    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0] if not (x in boxes["qImageFns"][0, 0])]
+    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0]]
 
     return qList, dbList
 
@@ -20,7 +20,7 @@ def compute_dist(mat_path, h5_file):
     boxes = sio.loadmat(mat_path)["dbStruct"]
 
     qList = [str(x[0][0]) for x in boxes["qImageFns"][0, 0]]
-    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0] if (not x in boxes["qImageFns"][0, 0])]
+    dbList = [str(x[0][0]) for x in boxes["dbImageFns"][0, 0]]
 
     qLoc = boxes["utmQ"][0, 0].transpose()
     dbLoc = boxes["utmDb"][0, 0].transpose()
@@ -32,7 +32,12 @@ def compute_dist(mat_path, h5_file):
         fH5.create_dataset('distance_matrix', shape = (numQ, numDB), dtype = 'f')
     distMat = fH5['distance_matrix']
     for i in range(numQ):
+        if i % 100 == 0:
+            print("compute progress: %s" % i)
         distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc, axis = 1)
+        for j in range(numDB):
+            if qList[i] == dbList[j]:
+                distMat[i, j] = 100
     fH5.close()
 
     return
@@ -106,7 +111,7 @@ def index_initial(h5File, qList, dbList):
 
     
 def multipro_load_image(data_dir, h5File, qList, dbList):
-    print("loading query image data...\n")
+    print("loading image data...\n")
     fH5 = h5py.File(h5File, 'r+')
 
     def single_load(idList, idxS, idxE):
@@ -118,8 +123,6 @@ def multipro_load_image(data_dir, h5File, qList, dbList):
                 fH5.create_dataset("%s/imageData" % ID, (224, 224, 3), dtype = 'f')
             fH5["%s/imageData" % ID][:] = train_utils.load_image(("%s/%s" % (data_dir, idList[i])))
         return
-
-    single_load(qList, 0, len(qList))
 
     single_load(dbList, 0, len(dbList))
     

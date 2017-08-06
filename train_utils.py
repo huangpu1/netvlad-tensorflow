@@ -135,7 +135,7 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
             for j in range(40):
                 batch[(batch_size * j + t), :] = fH5["%s/imageData" % dbList[pos[j]]]
             for k in range(20):
-                batch[(batch_size * k + 20 * batch_size + t), :] = fH5["%s/imageData" % dbList[neg[k]]]
+                batch[(batch_size * k + 40 * batch_size + t), :] = fH5["%s/imageData" % dbList[neg[k]]]
             idx += 1
 
         output = sess.run(model.vlad_output, feed_dict = {'query_image:0': batch, 'train_mode:0' : False})
