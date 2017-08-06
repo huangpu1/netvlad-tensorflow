@@ -37,7 +37,7 @@ def compute_dist(mat_path, h5_file):
         distMat[i, :] = np.linalg.norm(qLoc[i, :] - dbLoc, axis = 1)
         for j in range(numDB):
             if qList[i] == dbList[j]:
-                distMat[i, j] = 100
+                distMat[i, j] = 20
     fH5.close()
 
     return
