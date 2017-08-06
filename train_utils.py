@@ -122,7 +122,7 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
         fH5 = h5py.File(h5File, 'r+')
         z = i / numBatch * 100
         x = np.zeros((batch_size, 224, 224, 3))
-        labels = np.zeros((batch_size, 32768, 40))
+        labels = np.zeros((batch_size, 32768, 60))
         batch = np.zeros((batch_size * 60, 224, 224, 3))
         for t in range(batch_size):
             idx = idx % numQ
