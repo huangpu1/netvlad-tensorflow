@@ -101,10 +101,10 @@ def evaluate(sess, model, batch_size, h5File, qList, dbList, numRecall):
     for i in range(numQ):
         if i % 20 == 0:
             print("current accuracy: %.4f   %.4f    %.4f    %.4f   evaluation progress: %.4f" % (accuracy1, accuracy2, accuracy3, accuracy4, (float(i) / numQ)))
-        indices1 = np.argsort(L2_distance[i, :])[:1]
-        indices2 = np.argsort(L2_distance[i, :])[:5]
-        indices3 = np.argsort(L2_distance[i, :])[:10]
-        indices4 = np.argsort(L2_distance[i, :])[:20]
+        indices1 = np.argsort(L2_distance[i, :])[1:2]
+        indices2 = np.argsort(L2_distance[i, :])[1:6]
+        indices3 = np.argsort(L2_distance[i, :])[1:11]
+        indices4 = np.argsort(L2_distance[i, :])[1:21]
         for j in indices1:
             if distMat[i, j] < 25:
                 count1 += 1
