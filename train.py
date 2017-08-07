@@ -50,7 +50,7 @@ def main(_):
     if FLAGS.loadImage:
         train_init.multipro_load_image(FLAGS.data_dir, FLAGS.train_h5File, qList, dbList)
 
-    with tf.device('/gpu:0'):
+    with tf.device('/gpu:1'):
         sess = tf.Session()
 
         query_image = tf.placeholder(tf.float32,[None, 224, 224, 3], name = 'query_image')
