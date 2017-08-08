@@ -135,8 +135,12 @@ class Netvlad:
     def get_vald_pooling_var(self, k_cluster, alpha, name):
         initial_value = tf.truncated_normal([1, 512, 1, k_cluster], 0.0, 0.001)
         filters = self.get_var(initial_value, name, 0, name + "_filters")
-        centers = tf.scalar_mul(1/2/alpha, tf.squeeze(filters))
-        biases = tf.scalar_mul(-alpha, tf.reduce_sum(tf.multiply(centers, centers), axis = 0))
+
+        initial_value = tf.truncated_normal([512, k_cluster], 0.0, 0.001)
+        centers = self.get_var(initial_value, 1, name + '_centers')
+
+        initial_value = tf.truncated_normal([k_cluster], 0.0, 0.001)
+        biases = self.get_var(initial_value, 2, name + '_biases')
 
         return filters, biases, centers
 
