@@ -137,10 +137,10 @@ class Netvlad:
         filters = self.get_var(initial_value, name, 0, name + "_filters")
 
         initial_value = tf.truncated_normal([512, k_cluster], 0.0, 0.001)
-        centers = self.get_var(initial_value, 1, name + '_centers')
+        centers = self.get_var(initial_value, name, 1, name + '_centers')
 
         initial_value = tf.truncated_normal([k_cluster], 0.0, 0.001)
-        biases = self.get_var(initial_value, 2, name + '_biases')
+        biases = self.get_var(initial_value, name, 2, name + '_biases')
 
         return filters, biases, centers
 
