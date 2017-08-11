@@ -28,7 +28,8 @@ FLAGS = tf.app.flags.FLAGS
 
 
 def triplet_loss(q, labels, m):
-    L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
+    # L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
+    L2_distance = tf.reduce_sum((tf.expand_dims(q, axis = -1) - labels) ** 2, axis = 1)
     positives, negatives = tf.split(L2_distance, [40, 20], axis = 1)
     if FLAGS.useRelu:
         loss = tf.reduce_sum(tf.nn.relu(tf.subtract(tf.add(tf.reduce_min(positives, axis = -1, keep_dims = True), m), negatives)))
