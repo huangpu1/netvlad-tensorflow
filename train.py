@@ -34,7 +34,7 @@ def triplet_loss(q, labels, m):
     mindistP = tf.reduce_min(positives, keep_dims = False, axis = -1)
     mindistN = tf.reduce_min(negatives, keep_dims = False, axis = -1)
     if FLAGS.useRelu:
-        loss = tf.reduce_sum(mindistP, tf.reduce_sum(tf.nn.relu(tf.subtract(m, negatives))))
+        loss = tf.reduce_sum(mindistP + tf.reduce_sum(tf.nn.relu(tf.subtract(m, negatives)), axis = -1))
     else:
         loss = tf.reduce_sum(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives)
     # loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
