@@ -53,8 +53,8 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
     fH5 = h5py.File(h5File, 'r+')
     numQ = len(qList)
     numDB = len(dbList)
-    descriptorQ = np.zeros((numQ, 4096))
-    descriptorDB = np.zeros((numDB, 4096))
+    descriptorQ = np.zeros((numQ, 32768))
+    descriptorDB = np.zeros((numDB, 32768))
     L2_distance = np.zeros((numQ, numDB))
 
     batch = np.zeros((batch_size, 224, 224, 3))
@@ -126,7 +126,7 @@ def next_batch(sess, model, batch_size, h5File, idxS, qList, dbList):
         fH5 = h5py.File(h5File, 'r+')
         z = i / numBatch * 100
         x = np.zeros((batch_size, 224, 224, 3))
-        labels = np.zeros((batch_size, 4096, 60))
+        labels = np.zeros((batch_size, 32768, 60))
         batch = np.zeros((batch_size * 60, 224, 224, 3))
         for t in range(batch_size):
             idx = idx % numQ
