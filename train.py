@@ -31,10 +31,10 @@ def triplet_loss(q, labels, m):
     # L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
     L2_distance = tf.reduce_sum((tf.expand_dims(q, axis = -1) - labels) ** 2, axis = 1)
     positives, negatives = tf.split(L2_distance, [40, 20], axis = 1)
-    mindistP = tf.reduce_min(positives, keep_dims = False)
-    mindistN = tf.reduce_min(negatives, keep_dims = False)
+    mindistP = tf.reduce_min(positives, keep_dims = False, axis = -1)
+    mindistN = tf.reduce_min(negatives, keep_dims = False, axis = -1)
     if FLAGS.useRelu:
-        loss = tf.add(mindistP, tf.reduce_sum(tf.nn.relu(tf.subtract(m, negatives))))
+        loss = tf.reduce_sum(mindistP, tf.reduce_sum(tf.nn.relu(tf.subtract(m, negatives))))
     else:
         loss = tf.reduce_sum(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives)
     # loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
@@ -85,7 +85,7 @@ def main(_):
                 _, train_loss, minP, minN = sess.run([train, loss, mindistP, mindistN], feed_dict = {query_image: x, labels: y, train_mode: True})
                 if count % FLAGS.print_every == 0:
                     print("Epoch: %d    progress: %.4f%%  training_loss = %.6f\n" % (i, z, train_loss))
-                    print("Minimum L2 distance of P and N is %.6f   %.6f\n" % (minP, minN))
+                    print("Minimum L2 distance of P and N is %s   %s\n" % (minP, minN))
             if (i + 1) % FLAGS.save_every == 0:
                 model.save_npy(sess, "%s/netvlad_epoch_%d_loss_%.6f" % (FLAGS.checkpoint_dir, i, train_loss))
                 update_index_every *= 2
