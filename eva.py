@@ -21,16 +21,6 @@ tf.app.flags.DEFINE_boolean('loadImage', False, 'load dataset images or not')
 FLAGS = tf.app.flags.FLAGS
 
 
-def triplet_loss(q, labels, m):
-    L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
-    positives, negatives = tf.split(L2_distance, [20, 20], axis = 1)
-    if FLAGS.useRelu:
-        loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
-    else:
-        loss = tf.reduce_sum(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives)
-    # loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
-    return loss
-
 def main(_):
     qList, dbList = eva_init.get_List(FLAGS.mat_path)
     update_index_every = 600 / FLAGS.batch_size

@@ -65,7 +65,9 @@ class Netvlad:
         self.conv5_2 = self.conv_layer(self.conv5_1, 512, 512, "conv5_2")
         self.conv5_3 = self.conv_layer_5(self.conv5_2, 512, 512, "conv5_3")
 
-        self.vlad_output = self.vlad_pooling_layer(self.conv5_3, 64, 100, "vlad_pooling")
+        self.vlad_output_1 = self.vlad_pooling_layer(self.conv5_3, 64, 100, "vlad_pooling")
+
+        self.vlad_output = self.fc_layer(self.vlad_output_1, 32768, 4096, "vlad_fc")
 
         self.data_dict = None
 

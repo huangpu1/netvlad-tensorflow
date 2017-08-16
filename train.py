@@ -31,12 +31,13 @@ def triplet_loss(q, labels, m):
     # L2_distance = tf.norm(tf.subtract(tf.expand_dims(q, axis = -1), labels), axis = 1)
     L2_distance = tf.reduce_sum((tf.expand_dims(q, axis = -1) - labels) ** 2, axis = 1)
     positives, negatives = tf.split(L2_distance, [40, 20], axis = 1)
+    mindist = tf.reduce_min(positives, axis = -1, keep_dims = False)
     if FLAGS.useRelu:
         loss = tf.reduce_sum(tf.nn.relu(tf.subtract(tf.add(tf.reduce_min(positives, axis = -1, keep_dims = True), m), negatives)))
     else:
         loss = tf.reduce_sum(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives)
     # loss = tf.reduce_sum(tf.nn.relu(tf.reduce_min(positives, axis = -1, keep_dims = True) + m - negatives))
-    return loss
+    return loss, mindist
 
 def main(_):
     qList, dbList = train_init.get_List(FLAGS.mat_path)
@@ -55,7 +56,7 @@ def main(_):
         sess = tf.Session()
 
         query_image = tf.placeholder(tf.float32,[None, 224, 224, 3], name = 'query_image')
-        labels = tf.placeholder(tf.float32, [None, 32768, 60])
+        labels = tf.placeholder(tf.float32, [None, 4096, 60])
         train_mode = tf.placeholder(tf.bool, name = 'train_mode')
 
         model = netvlad.Netvlad('vgg16.npy')
@@ -65,7 +66,7 @@ def main(_):
 
         
 
-        loss = triplet_loss(model.vlad_output, labels, 0.1)
+        loss, mindist = triplet_loss(model.vlad_output, labels, 0.1)
         train = tf.train.RMSPropOptimizer(FLAGS.lr).minimize(loss)
         sess.run(tf.global_variables_initializer())
         train_loss = 0
@@ -80,9 +81,10 @@ def main(_):
                     count = 0
                     train_utils.index_update(sess, model, FLAGS.batch_size * 30, FLAGS.train_h5File, qList, dbList)
                 
-                _, train_loss = sess.run([train, loss], feed_dict = {query_image: x, labels: y, train_mode: True})
+                _, train_loss, train_min = sess.run([train, loss, mindist], feed_dict = {query_image: x, labels: y, train_mode: True})
                 if count % FLAGS.print_every == 0:
                     print("Epoch: %d    progress: %.4f%%  training_loss = %.6f\n" % (i, z, train_loss))
+                    print("Minimum L2 distance between query image and positives is %.6f\n" % train_min)
             if (i + 1) % FLAGS.save_every == 0:
                 model.save_npy(sess, "%s/netvlad_epoch_%d_loss_%.6f" % (FLAGS.checkpoint_dir, i, train_loss))
                 update_index_every *= 2
