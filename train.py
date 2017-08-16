@@ -67,7 +67,7 @@ def main(_):
 
         
 
-        loss, mindistP, mindistN = triplet_loss(model.vlad_output, labels, 0.1)
+        loss, mindistP, mindistN = triplet_loss(model.vlad_output, labels, 0.2)
         train = tf.train.RMSPropOptimizer(FLAGS.lr).minimize(loss)
         sess.run(tf.global_variables_initializer())
         train_loss = 0
