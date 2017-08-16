@@ -92,6 +92,8 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
     D[D < 0] = 0
     L2_distance = np.sqrt(D)
 
+    distMat = fH5['distance_matrix']
+    
     for i in range(numQ):
         ID = qList[i]
         if i % 20 == 0:
@@ -99,6 +101,8 @@ def index_update(sess, model, batch_size, h5File, qList, dbList):
 
         neg = fH5["%s/negatives" % ID]
         pneg = fH5["%s/potential_negatives" % ID]
+        indices = np.where(distMat[i, :] >= 25)[0]
+        pneg[:] = random.sample(indices, 1000)
 
         indices = np.argsort(L2_distance[i, pneg[:]])[:10]
 
