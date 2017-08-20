@@ -52,8 +52,8 @@ def evaluate(sess, model, batch_size, h5File, qList, dbList, numRecall):
     distMat = fH5['distance_matrix']
     numQ = len(qList)
     numDB = len(dbList)
-    descriptorQ = np.zeros((numQ, 4096))
-    descriptorDB = np.zeros((numDB, 4096))
+    descriptorQ = np.zeros((numQ, 32768))
+    descriptorDB = np.zeros((numDB, 32768))
 
     batch = np.zeros((batch_size, 224, 224, 3))
     single = np.zeros((1, 224, 224, 3))
